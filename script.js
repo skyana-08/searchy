@@ -1,5 +1,4 @@
-// ⚠️ IMPORTANT: Replace this URL with your Google Apps Script Web App URL
-const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
+const API_URL = '[script.google.com](https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec)';
 
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -8,14 +7,12 @@ async function performSearch() {
     const loadingDiv = document.getElementById('loading');
     const searchBtn = document.getElementById('searchBtn');
     
-    // Validate input
     if (!searchTerm) {
-        showMessage('error', 'Please enter a search term', '⚠️');
+        showMessage('error', 'Please enter a search term to continue.', '🔍');
         searchInput.focus();
         return;
     }
     
-    // Show loading state
     loadingDiv.style.display = 'block';
     resultDiv.innerHTML = '';
     searchBtn.disabled = true;
@@ -30,7 +27,6 @@ async function performSearch() {
         
         const data = await response.json();
         
-        // Hide loading
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
         searchInput.disabled = false;
@@ -39,11 +35,10 @@ async function performSearch() {
         if (data.found && data.data) {
             displayResult(data.data);
         } else {
-            showMessage('error', 'No Accounts found, Negative for Field Visit.','⚠️');
+            showMessage('error', 'No accounts matched your search. This account is negative for field visit.', '📭');
         }
         
     } catch (error) {
-        // Hide loading
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
         searchInput.disabled = false;
@@ -59,29 +54,48 @@ function displayResult(data) {
     const html = `
         <div class="result-card success">
             <div class="result-header">
-                <div class="result-icon">✅</div>
-                <h2 class="result-title">Account Found</h2>
+                <div class="result-icon">✓</div>
+                <div class="result-title-group">
+                    <h2 class="result-title">Account Found</h2>
+                    <p class="result-subtitle">Verified in database</p>
+                </div>
+                <span class="result-badge">GO</span>
             </div>
             <div class="result-details">
-                <div class="detail-card">
-                    <span class="detail-label">Account Name</span>
-                    <span class="detail-value">${escapeHtml(data.name)}</span>
+                <div class="detail-row">
+                    <div class="detail-icon">👤</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Account Name</div>
+                        <div class="detail-value highlight">${escapeHtml(data.name)}</div>
+                    </div>
                 </div>
-                <div class="detail-card">
-                    <span class="detail-label">CH Code</span>
-                    <span class="detail-value">${escapeHtml(data.code)}</span>
+                <div class="detail-row">
+                    <div class="detail-icon">🏷️</div>
+                    <div class="detail-content">
+                        <div class="detail-label">CH Code</div>
+                        <div class="detail-value">${escapeHtml(data.code)}</div>
+                    </div>
                 </div>
-                <div class="detail-card">
-                    <span class="detail-label">Opening Balance (OB)</span>
-                    <span class="detail-value amount">₱${escapeHtml(data.ob)}</span>
+                <div class="detail-row">
+                    <div class="detail-icon">📊</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Opening Balance (OB)</div>
+                        <div class="detail-value amount">₱${escapeHtml(data.ob)}</div>
+                    </div>
                 </div>
-                <div class="detail-card">
-                    <span class="detail-label">Payment Due (PD)</span>
-                    <span class="detail-value amount">₱${escapeHtml(data.pd)}</span>
+                <div class="detail-row">
+                    <div class="detail-icon">📅</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Payment Due (PD)</div>
+                        <div class="detail-value amount">₱${escapeHtml(data.pd)}</div>
+                    </div>
                 </div>
-                <div class="detail-card">
-                    <span class="detail-label">Minimum Amount Due (MAD)</span>
-                    <span class="detail-value amount">₱${escapeHtml(data.mad)}</span>
+                <div class="detail-row">
+                    <div class="detail-icon">💳</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Minimum Amount Due (MAD)</div>
+                        <div class="detail-value amount">₱${escapeHtml(data.mad)}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,16 +112,20 @@ function showMessage(type, message, icon) {
         <div class="result-card ${isError ? 'error' : 'success'}">
             <div class="result-header">
                 <div class="result-icon">${icon}</div>
-                <h2 class="result-title">${isError ? 'Search Result' : 'Success'}</h2>
+                <div class="result-title-group">
+                    <h2 class="result-title">${isError ? 'No Results' : 'Success'}</h2>
+                    <p class="result-subtitle">${isError ? 'Search completed' : 'Operation successful'}</p>
+                </div>
             </div>
-            <div class="error-message">${escapeHtml(message)}</div>
+            <div class="error-message">
+                ${escapeHtml(message)}
+            </div>
         </div>
     `;
     
     resultDiv.innerHTML = html;
 }
 
-// Helper function to prevent XSS
 function escapeHtml(text) {
     if (text === null || text === undefined) return '';
     const div = document.createElement('div');
@@ -115,14 +133,12 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Allow Enter key to trigger search
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         performSearch();
     }
 });
 
-// Focus on input when page loads
 window.addEventListener('load', function() {
     document.getElementById('searchInput').focus();
 });
