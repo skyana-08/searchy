@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Replace this URL with your Google Apps Script Web App URL
-const API_URL = 'https://script.google.com/macros/s/AKfycbzY0bfkFITHybnBBcm4aK2oBTUXObw3dr2swT5bBBCWDwbTi7kcyIp9WV3uo4mmhpJh/exec';
+const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -10,7 +10,7 @@ async function performSearch() {
     
     // Validate input
     if (!searchTerm) {
-        showError('Please enter a search term');
+        showMessage('error', 'Please enter a search term', '⚠️');
         searchInput.focus();
         return;
     }
@@ -34,11 +34,12 @@ async function performSearch() {
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
         searchInput.disabled = false;
+        searchInput.focus();
         
         if (data.found && data.data) {
             displayResult(data.data);
         } else {
-            showNoResult();
+            showMessage('error', 'No results found for your search. Please try different keywords.', '🔍');
         }
         
     } catch (error) {
@@ -47,7 +48,7 @@ async function performSearch() {
         searchBtn.disabled = false;
         searchInput.disabled = false;
         
-        showError('Failed to connect to database. Please check your connection and try again.');
+        showMessage('error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
         console.error('Search error:', error);
     }
 }
@@ -57,27 +58,30 @@ function displayResult(data) {
     
     const html = `
         <div class="result-card success">
-            <div class="result-title">✅ Account Found</div>
+            <div class="result-header">
+                <div class="result-icon">✅</div>
+                <h2 class="result-title">Account Found</h2>
+            </div>
             <div class="result-details">
-                <div class="detail-item">
+                <div class="detail-card">
                     <span class="detail-label">Account Name</span>
-                    <span class="detail-value highlight">${escapeHtml(data.name)}</span>
+                    <span class="detail-value">${escapeHtml(data.name)}</span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-card">
                     <span class="detail-label">CH Code</span>
                     <span class="detail-value">${escapeHtml(data.code)}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">OB (Opening Balance)</span>
-                    <span class="detail-value">₱${escapeHtml(data.ob)}</span>
+                <div class="detail-card">
+                    <span class="detail-label">Opening Balance (OB)</span>
+                    <span class="detail-value amount">₱${escapeHtml(data.ob)}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">PD (Payment Due)</span>
-                    <span class="detail-value">₱${escapeHtml(data.pd)}</span>
+                <div class="detail-card">
+                    <span class="detail-label">Payment Due (PD)</span>
+                    <span class="detail-value amount">₱${escapeHtml(data.pd)}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">MAD (Minimum Amount Due)</span>
-                    <span class="detail-value">₱${escapeHtml(data.mad)}</span>
+                <div class="detail-card">
+                    <span class="detail-label">Minimum Amount Due (MAD)</span>
+                    <span class="detail-value amount">₱${escapeHtml(data.mad)}</span>
                 </div>
             </div>
         </div>
@@ -86,26 +90,17 @@ function displayResult(data) {
     resultDiv.innerHTML = html;
 }
 
-function showNoResult() {
+function showMessage(type, message, icon) {
     const resultDiv = document.getElementById('result');
+    const isError = type === 'error';
     
     const html = `
-        <div class="result-card error">
-            <div class="result-title">❌ No Result Found</div>
-            <p class="error-message">The search term was not found in the database. Please try different keywords.</p>
-        </div>
-    `;
-    
-    resultDiv.innerHTML = html;
-}
-
-function showError(message) {
-    const resultDiv = document.getElementById('result');
-    
-    const html = `
-        <div class="result-card error">
-            <div class="result-title">⚠️ Error</div>
-            <p class="error-message">${escapeHtml(message)}</p>
+        <div class="result-card ${isError ? 'error' : 'success'}">
+            <div class="result-header">
+                <div class="result-icon">${icon}</div>
+                <h2 class="result-title">${isError ? 'Search Result' : 'Success'}</h2>
+            </div>
+            <div class="error-message">${escapeHtml(message)}</div>
         </div>
     `;
     
@@ -114,8 +109,9 @@ function showError(message) {
 
 // Helper function to prevent XSS
 function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = String(text);
     return div.innerHTML;
 }
 
