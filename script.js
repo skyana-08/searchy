@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Replace this URL with your Google Apps Script Web App URL
-const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzY0bfkFITHybnBBcm4aK2oBTUXObw3dr2swT5bBBCWDwbTi7kcyIp9WV3uo4mmhpJh/exec';
 
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
