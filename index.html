@@ -3,37 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Search System</title>
+    <meta name="description" content="Professional Account Search System">
+    <title>Account Search | Professional Database</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Using emoji as icons to avoid external dependencies -->
 </head>
 <body>
     <div class="container">
+        <!-- Gold accent line is handled by CSS ::before -->
+        
         <div class="header">
-            <h1>🔍 Account Search</h1>
-            <p>Search by name, code, or any detail</p>
+            <div class="logo-icon">💼</div>
+            <h1>Account Search System</h1>
+            <p class="subtitle">Search your database by name, code, or amount</p>
         </div>
         
         <div class="search-box">
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="Search name, code, or amount..."
-                autocomplete="off"
-            />
-            <button onclick="performSearch()" id="searchBtn">
-                <span>Search</span>
+            <div class="input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Enter name, CH code, or amount..."
+                    autocomplete="off"
+                    aria-label="Search term"
+                />
+            </div>
+            <button onclick="performSearch()" id="searchBtn" aria-label="Search">
+                Search
             </button>
         </div>
         
-        <div id="loading" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>Searching database...</p>
+        <div id="loading" class="loading">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <p class="spinner-text">Searching database...</p>
+            </div>
         </div>
         
         <div id="result"></div>
         
         <div class="footer">
-            <p>💡 Tip: You can search by name, code (e.g., 02SBCCAC2604), or amount</p>
+            <div class="footer-content">
+                <span class="footer-icon">💡</span>
+                <span>Tip: You can search using any field - name, code, or amount</span>
+            </div>
         </div>
     </div>
 
