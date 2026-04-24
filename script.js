@@ -39,7 +39,7 @@ async function performSearch() {
         if (data.found && data.data) {
             displayResult(data.data);
         } else {
-            showMessage('error', 'No Accounts found, Negative for Field Visit.');
+            showMessage('error', 'No Accounts found, Negative for Field Visit.'⚠️');
         }
         
     } catch (error) {
