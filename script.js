@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Replace this URL with your Google Apps Script Web App URL
-const API_URL = 'https://script.google.com/macros/s/AKfycbzY0bfkFITHybnBBcm4aK2oBTUXObw3dr2swT5bBBCWDwbTi7kcyIp9WV3uo4mmhpJh/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
 
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -39,7 +39,7 @@ async function performSearch() {
         if (data.found && data.data) {
             displayResult(data.data);
         } else {
-            showMessage('error', 'No results found for your search. Please try different keywords.', '🔍');
+            showMessage('error', 'No Accounts found, Negative for Field Visit.');
         }
         
     } catch (error) {
