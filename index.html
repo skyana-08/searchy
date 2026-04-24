@@ -5,33 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Professional Account Search System">
     <title>Account Search | Professional Database</title>
+    <link rel="preconnect" href="[fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap)" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Using emoji as icons to avoid external dependencies -->
 </head>
 <body>
     <div class="container">
-        <!-- Gold accent line is handled by CSS ::before -->
-        
-        <div class="header">
+        <header class="header">
             <div class="logo-icon">💼</div>
-            <h1>Account Search System</h1>
+            <h1>Account <span>Search</span></h1>
             <p class="subtitle">Search your database by name, code, or amount</p>
-        </div>
+        </header>
         
         <div class="search-box">
-            <div class="input-wrapper">
+            <div class="search-wrapper">
                 <span class="search-icon">🔍</span>
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Enter name, CH code, or amount..."
+                    placeholder="Search by name, CH code, or amount..."
                     autocomplete="off"
                     aria-label="Search term"
                 />
+                <button id="searchBtn" onclick="performSearch()" aria-label="Search">
+                    <span>Search</span>
+                </button>
             </div>
-            <button onclick="performSearch()" id="searchBtn" aria-label="Search">
-                Search
-            </button>
+            <div class="quick-actions">
+                <button class="quick-action" onclick="document.getElementById('searchInput').value='CH'; document.getElementById('searchInput').focus();">
+                    🏷️ By Code
+                </button>
+                <button class="quick-action" onclick="document.getElementById('searchInput').focus();">
+                    👤 By Name
+                </button>
+                <button class="quick-action" onclick="document.getElementById('searchInput').focus();">
+                    💰 By Amount
+                </button>
+            </div>
         </div>
         
         <div id="loading" class="loading">
@@ -43,12 +54,12 @@
         
         <div id="result"></div>
         
-        <div class="footer">
+        <footer class="footer">
             <div class="footer-content">
                 <span class="footer-icon">💡</span>
-                <span>Tip: You can search using any field - name, code, or amount</span>
+                <span>Tip: Press Enter to search quickly</span>
             </div>
-        </div>
+        </footer>
     </div>
 
     <script src="script.js"></script>
