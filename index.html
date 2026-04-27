@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Account Verification Portal — Field Visit Database">
-    <title>AcctVerify | Field Visit Database</title>
+    <meta name="description" content="SB Account Checker — Field Visit Database">
+    <title>CheckMyCH | Field Visit Database</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -18,11 +18,18 @@
     <nav class="topbar">
         <div class="topbar-brand">
             <div class="topbar-logo">🔐</div>
-            <span class="topbar-name">ACCT<span>VERIFY</span></span>
+            <span class="topbar-name">Check<span>MyCH</span></span>
         </div>
-        <div class="topbar-status">
-            <div class="status-dot"></div>
-            <span>Database Connected</span>
+        <div class="topbar-right">
+            <div class="topbar-status">
+                <div class="status-dot"></div>
+                <span>Database Connected</span>
+            </div>
+            <!-- Dark/Light mode toggle -->
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+                <span class="theme-icon theme-icon-dark">🌙</span>
+                <span class="theme-icon theme-icon-light">☀️</span>
+            </button>
         </div>
     </nav>
 
@@ -31,8 +38,8 @@
         <!-- Hero -->
         <div class="hero">
             <div class="hero-eyebrow">Field Visit Verification System</div>
-            <h1>Account <em>Intelligence</em><br>at Your Fingertips</h1>
-            <p class="hero-sub">Search the database to verify whether an account is eligible for field visit. Enter a name, CH code, or any account identifier below.</p>
+            <h1>SBC CH Code<br><em>Checker</em></h1>
+            <p class="hero-sub">Search the database to verify whether an account is eligible for field visit.</p>
         </div>
 
         <!-- Search panel -->
@@ -82,6 +89,14 @@
 
             <!-- Result -->
             <div id="result"></div>
+        </div>
+
+        <!-- Abbreviation legend -->
+        <div class="abbrev-legend">
+            <span class="abbrev-legend-title">Abbreviations:</span>
+            <span class="abbrev-pill" title="Outstanding Balance">OB <span class="abbrev-full">Outstanding Balance</span></span>
+            <span class="abbrev-pill" title="Past Due">PD <span class="abbrev-full">Past Due</span></span>
+            <span class="abbrev-pill" title="Minimum Amount Due">MAD <span class="abbrev-full">Minimum Amount Due</span></span>
         </div>
 
         <!-- Stats chips -->
