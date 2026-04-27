@@ -6,124 +6,119 @@ async function performSearch() {
     const resultDiv = document.getElementById('result');
     const loadingDiv = document.getElementById('loading');
     const searchBtn = document.getElementById('searchBtn');
-    
+
     if (!searchTerm) {
-        showMessage('error', 'Please enter a search term to continue.', '🔍');
+        showMessage('error', 'No query entered', 'Please enter a name, CH code, or amount to search the database.', '🔍');
         searchInput.focus();
         return;
     }
-    
+
     loadingDiv.style.display = 'block';
     resultDiv.innerHTML = '';
     searchBtn.disabled = true;
     searchInput.disabled = true;
-    
+
     try {
         const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
-        
+
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
         searchInput.disabled = false;
         searchInput.focus();
-        
+
         if (data.found && data.data) {
             displayResult(data.data);
         } else {
-            showMessage('error', 'No accounts matched your search. This account is negative for field visit.', '📭');
+            showMessage('error', 'Account Not Found', 'No accounts matched your search. This account is negative for field visit.', '📭');
         }
-        
+
     } catch (error) {
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
         searchInput.disabled = false;
-        
-        showMessage('error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
+        showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
         console.error('Search error:', error);
     }
 }
 
 function displayResult(data) {
     const resultDiv = document.getElementById('result');
-    
-    const html = `
+
+    resultDiv.innerHTML = `
         <div class="result-card success">
-            <div class="result-header">
-                <div class="result-icon">✓</div>
-                <div class="result-title-group">
-                    <h2 class="result-title">Account Found</h2>
-                    <p class="result-subtitle">Verified in database</p>
+            <div class="card-header">
+                <div class="card-header-icon">✓</div>
+                <div class="card-header-info">
+                    <div class="card-header-title">Account Verified</div>
+                    <div class="card-header-sub">CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT</div>
                 </div>
-                <span class="result-badge">GO</span>
+                <span class="card-badge">✓ GO</span>
             </div>
-            <div class="result-details">
-                <div class="detail-row">
-                    <div class="detail-icon">👤</div>
-                    <div class="detail-content">
-                        <div class="detail-label">Account Name</div>
-                        <div class="detail-value highlight">${escapeHtml(data.name)}</div>
+            <div class="card-details">
+                <div class="detail-item">
+                    <div class="detail-item-icon">👤</div>
+                    <div class="detail-item-content">
+                        <div class="detail-item-label">Account Name</div>
+                        <div class="detail-item-value name-val">${escapeHtml(data.name)}</div>
                     </div>
                 </div>
-                <div class="detail-row">
-                    <div class="detail-icon">🏷️</div>
-                    <div class="detail-content">
-                        <div class="detail-label">CH Code</div>
-                        <div class="detail-value">${escapeHtml(data.code)}</div>
+                <div class="detail-item">
+                    <div class="detail-item-icon">🏷️</div>
+                    <div class="detail-item-content">
+                        <div class="detail-item-label">CH Code</div>
+                        <div class="detail-item-value code-val">${escapeHtml(data.code)}</div>
                     </div>
                 </div>
-                <div class="detail-row">
-                    <div class="detail-icon">📊</div>
-                    <div class="detail-content">
-                        <div class="detail-label">Opening Balance (OB)</div>
-                        <div class="detail-value amount">₱${escapeHtml(data.ob)}</div>
+                <div class="detail-item">
+                    <div class="detail-item-icon">📊</div>
+                    <div class="detail-item-content">
+                        <div class="detail-item-label">Opening Balance (OB)</div>
+                        <div class="detail-item-value amount-val">₱${escapeHtml(data.ob)}</div>
                     </div>
                 </div>
-                <div class="detail-row">
-                    <div class="detail-icon">📅</div>
-                    <div class="detail-content">
-                        <div class="detail-label">Payment Due (PD)</div>
-                        <div class="detail-value amount">₱${escapeHtml(data.pd)}</div>
+                <div class="detail-item">
+                    <div class="detail-item-icon">📅</div>
+                    <div class="detail-item-content">
+                        <div class="detail-item-label">Payment Due (PD)</div>
+                        <div class="detail-item-value amount-val">₱${escapeHtml(data.pd)}</div>
                     </div>
                 </div>
-                <div class="detail-row">
-                    <div class="detail-icon">💳</div>
-                    <div class="detail-content">
-                        <div class="detail-label">Minimum Amount Due (MAD)</div>
-                        <div class="detail-value amount">₱${escapeHtml(data.mad)}</div>
+                <div class="detail-item">
+                    <div class="detail-item-icon">💳</div>
+                    <div class="detail-item-content">
+                        <div class="detail-item-label">Minimum Amount Due (MAD)</div>
+                        <div class="detail-item-value amount-val">₱${escapeHtml(data.mad)}</div>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    
-    resultDiv.innerHTML = html;
 }
 
-function showMessage(type, message, icon) {
+function showMessage(type, title, message, icon) {
     const resultDiv = document.getElementById('result');
     const isError = type === 'error';
-    
-    const html = `
+
+    resultDiv.innerHTML = `
         <div class="result-card ${isError ? 'error' : 'success'}">
-            <div class="result-header">
-                <div class="result-icon">${icon}</div>
-                <div class="result-title-group">
-                    <h2 class="result-title">${isError ? 'No Results' : 'Success'}</h2>
-                    <p class="result-subtitle">${isError ? 'Search completed' : 'Operation successful'}</p>
+            <div class="card-header">
+                <div class="card-header-icon">${icon}</div>
+                <div class="card-header-info">
+                    <div class="card-header-title">${escapeHtml(title)}</div>
+                    <div class="card-header-sub">${isError ? 'SEARCH COMPLETED — NO MATCH' : 'OPERATION SUCCESSFUL'}</div>
                 </div>
             </div>
-            <div class="error-message">
-                ${escapeHtml(message)}
+            <div class="card-message">
+                <p class="card-message-text">${escapeHtml(message)}</p>
             </div>
         </div>
     `;
-    
-    resultDiv.innerHTML = html;
 }
 
 function escapeHtml(text) {
@@ -133,12 +128,20 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-document.getElementById('searchInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        performSearch();
-    }
+function focusSearch() {
+    document.getElementById('searchInput').focus();
+}
+
+function prefillSearch(val) {
+    const input = document.getElementById('searchInput');
+    input.value = val;
+    input.focus();
+}
+
+document.getElementById('searchInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') performSearch();
 });
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     document.getElementById('searchInput').focus();
 });
