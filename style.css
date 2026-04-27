@@ -24,7 +24,6 @@
     --font-body:    'Lato', sans-serif;
     --font-mono:    'DM Mono', monospace;
     
-    /* Animation timings */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.25s ease;
     --transition-slow: 0.4s ease;
@@ -364,7 +363,7 @@ body::before {
 
 .split-right .results-area {
     width: 100%;
-    max-width: 850px;
+    max-width: 750px;
     margin: 0;
 }
 
@@ -378,7 +377,7 @@ body::before {
 }
 
 .split-right .result-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -393,16 +392,16 @@ body::before {
     }
 }
 
-/* Make result card larger and wider */
+/* Balanced result card sizing */
 .split-right .card-header {
-    padding: 32px 40px;
+    padding: 20px 28px;
     transition: all var(--transition-normal);
 }
 
 .split-right .card-header-icon {
-    width: 64px;
-    height: 64px;
-    font-size: 30px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
     transition: all var(--transition-normal);
     animation: bounceIn 0.5s ease-out;
 }
@@ -417,7 +416,7 @@ body::before {
         transform: scale(1.05);
     }
     70% {
-        transform: scale(0.9);
+        transform: scale(0.95);
     }
     100% {
         transform: scale(1);
@@ -425,11 +424,11 @@ body::before {
 }
 
 .split-right .card-header-icon:hover {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.08) rotate(5deg);
 }
 
 .split-right .card-header-title {
-    font-size: 24px;
+    font-size: 18px;
     background: linear-gradient(135deg, var(--text-heading), var(--accent-amount));
     background-clip: text;
     -webkit-background-clip: text;
@@ -437,43 +436,28 @@ body::before {
 }
 
 .split-right .card-header-sub {
-    font-size: 13px;
+    font-size: 11px;
 }
 
 .split-right .card-badge {
-    padding: 8px 18px;
-    font-size: 13px;
-    position: relative;
-    overflow: hidden;
+    padding: 5px 12px;
+    font-size: 11px;
     transition: all var(--transition-normal);
 }
 
-.split-right .card-badge::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.split-right .card-badge:hover::before {
-    width: 100%;
-    height: 100%;
+.split-right .card-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(0, 166, 81, 0.4);
 }
 
 .split-right .card-details {
-    padding: 28px 40px 40px;
-    gap: 16px;
+    padding: 16px 28px 24px;
+    gap: 10px;
 }
 
 .split-right .detail-item {
-    padding: 22px 24px;
-    gap: 20px;
+    padding: 14px 18px;
+    gap: 16px;
     transition: all var(--transition-normal);
     cursor: pointer;
     position: relative;
@@ -496,31 +480,35 @@ body::before {
 }
 
 .split-right .detail-item:hover {
-    transform: translateX(8px);
+    transform: translateX(6px);
     background: var(--bg-detail-hover);
     border-color: var(--border-tag-hover);
 }
 
 .split-right .detail-item-icon {
-    width: 52px;
-    height: 52px;
-    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
     transition: all var(--transition-fast);
 }
 
 .split-right .detail-item:hover .detail-item-icon {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.08) rotate(5deg);
 }
 
 .split-right .detail-item-label {
-    font-size: 12px;
-    margin-bottom: 8px;
+    font-size: 10px;
+    margin-bottom: 6px;
     letter-spacing: 0.5px;
 }
 
 .split-right .detail-item-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
+}
+
+.split-right .detail-item:hover .detail-item-value {
+    transform: translateX(3px);
 }
 
 .results-area .loading.active {
@@ -598,7 +586,7 @@ body::before {
 
 .hero h1 {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 6vw, 4.2rem);
+    font-size: clamp(1.8rem, 5vw, 3.5rem);
     font-weight: 900;
     line-height: 1.15;
     background: linear-gradient(135deg, var(--text-heading), var(--sb-blue-400));
@@ -610,7 +598,7 @@ body::before {
 }
 
 .hero-sub {
-    font-size: clamp(13px, 4vw, 15px);
+    font-size: clamp(13px, 3.5vw, 15px);
     color: var(--text-secondary);
     line-height: 1.65;
     animation: fadeInUp 0.6s ease-out 0.2s backwards;
@@ -638,7 +626,7 @@ body::before {
 .search-field:focus-within {
     border-color: var(--border-input-focus);
     box-shadow: var(--shadow-glow);
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
 .search-field-icon {
@@ -658,9 +646,9 @@ body::before {
     background: transparent;
     border: none;
     outline: none;
-    font-size: 16px;
+    font-size: 15px;
     color: var(--text-primary);
-    padding: 16px 0;
+    padding: 14px 0;
 }
 
 #searchInput::placeholder {
@@ -675,11 +663,12 @@ body::before {
 
 #searchBtn {
     flex-shrink: 0;
-    padding: 14px 28px;
+    padding: 12px 24px;
     background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
     border-radius: 10px;
     color: white;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -764,14 +753,14 @@ body::before {
     overflow: hidden;
     background: var(--bg-card);
     backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     margin-bottom: 16px;
     transition: all var(--transition-normal);
     animation: fadeInUp 0.5s ease-out;
 }
 
 .result-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -780,29 +769,29 @@ body::before {
 }
 
 .card-header {
-    padding: 24px 28px;
+    padding: 18px 24px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     background: var(--card-header-success-bg);
     border-bottom: 1px solid var(--card-header-success-border);
 }
 
 .card-header-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     background: rgba(0, 166, 81, 0.12);
     border: 1px solid rgba(0, 166, 81, 0.3);
     transition: all var(--transition-fast);
 }
 
 .card-header-icon:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .card-header-info {
@@ -810,21 +799,21 @@ body::before {
 }
 
 .card-header-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-heading);
 }
 
 .card-header-sub {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
 }
 
 .card-badge {
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 100px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     background: linear-gradient(135deg, var(--sb-green-500), var(--sb-green-700));
     color: white;
@@ -833,11 +822,11 @@ body::before {
 
 .card-badge:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 166, 81, 0.5);
+    box-shadow: 0 0 12px rgba(0, 166, 81, 0.4);
 }
 
 .card-details {
-    padding: 20px 28px 28px;
+    padding: 16px 24px 20px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -847,7 +836,7 @@ body::before {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-radius: 10px;
     background: var(--bg-detail-item);
     border: 1px solid var(--border-detail);
@@ -879,22 +868,23 @@ body::before {
 }
 
 .detail-item-icon {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
     background: var(--bg-tag);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--transition-fast);
+    font-size: 18px;
 }
 
 .detail-item:hover .detail-item-icon {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.08) rotate(5deg);
 }
 
 .detail-item-label {
-    font-size: 10px;
+    font-size: 9px;
     font-family: var(--font-mono);
     font-weight: 600;
     color: var(--text-muted);
@@ -904,13 +894,13 @@ body::before {
 }
 
 .detail-item-value {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     transition: all var(--transition-fast);
 }
 
 .detail-item:hover .detail-item-value {
-    transform: translateX(4px);
+    transform: translateX(3px);
 }
 
 .detail-item-value.name-val {
@@ -1046,33 +1036,33 @@ html {
 /* Laptops and Desktops (1200px and below) */
 @media (max-width: 1200px) {
     .split-right .results-area {
-        max-width: 750px;
+        max-width: 680px;
     }
     
     .split-right .card-header {
-        padding: 28px 32px;
+        padding: 18px 24px;
     }
     
     .split-right .card-header-icon {
-        width: 56px;
-        height: 56px;
-        font-size: 26px;
-    }
-    
-    .split-right .card-header-title {
+        width: 44px;
+        height: 44px;
         font-size: 22px;
     }
     
+    .split-right .card-header-title {
+        font-size: 17px;
+    }
+    
     .split-right .card-details {
-        padding: 24px 32px 32px;
+        padding: 14px 24px 20px;
     }
     
     .split-right .detail-item {
-        padding: 18px 20px;
+        padding: 12px 16px;
     }
     
     .split-right .detail-item-value {
-        font-size: 18px;
+        font-size: 15px;
     }
 }
 
@@ -1088,41 +1078,41 @@ html {
     }
     
     .split-right .results-area {
-        max-width: 650px;
+        max-width: 600px;
     }
     
     .split-right .card-header {
-        padding: 24px 28px;
+        padding: 16px 22px;
     }
     
     .split-right .card-header-icon {
-        width: 52px;
-        height: 52px;
-        font-size: 24px;
-    }
-    
-    .split-right .card-header-title {
+        width: 42px;
+        height: 42px;
         font-size: 20px;
     }
     
+    .split-right .card-header-title {
+        font-size: 16px;
+    }
+    
     .split-right .card-details {
-        padding: 20px 28px 28px;
-        gap: 12px;
+        padding: 12px 22px 18px;
+        gap: 8px;
     }
     
     .split-right .detail-item {
-        padding: 16px 18px;
-        gap: 16px;
+        padding: 11px 14px;
+        gap: 14px;
     }
     
     .split-right .detail-item-icon {
-        width: 44px;
-        height: 44px;
-        font-size: 22px;
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
     }
     
     .split-right .detail-item-value {
-        font-size: 17px;
+        font-size: 14px;
     }
 }
 
@@ -1142,15 +1132,15 @@ html {
     .split-left {
         width: 100%;
         position: relative;
-        min-height: 50vh;
-        padding: 60px 24px 40px;
+        min-height: auto;
+        padding: 50px 24px 30px;
     }
     
     .split-right {
         width: 100%;
         position: relative;
-        min-height: 50vh;
-        padding: 40px 24px 60px;
+        min-height: auto;
+        padding: 30px 24px 50px;
         padding-right: 24px;
     }
     
@@ -1168,51 +1158,51 @@ html {
     }
     
     .split-right .card-header {
-        padding: 20px 24px;
+        padding: 16px 20px;
     }
     
     .split-right .card-header-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 22px;
-    }
-    
-    .split-right .card-header-title {
+        width: 40px;
+        height: 40px;
         font-size: 18px;
     }
     
+    .split-right .card-header-title {
+        font-size: 15px;
+    }
+    
     .split-right .card-header-sub {
-        font-size: 11px;
+        font-size: 10px;
     }
     
     .split-right .card-badge {
-        padding: 6px 14px;
-        font-size: 11px;
+        padding: 4px 10px;
+        font-size: 10px;
     }
     
     .split-right .card-details {
-        padding: 16px 24px 24px;
-        gap: 10px;
+        padding: 12px 20px 18px;
+        gap: 8px;
     }
     
     .split-right .detail-item {
-        padding: 14px 16px;
-        gap: 14px;
+        padding: 10px 12px;
+        gap: 12px;
     }
     
     .split-right .detail-item-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
     }
     
     .split-right .detail-item-label {
-        font-size: 10px;
-        margin-bottom: 6px;
+        font-size: 9px;
+        margin-bottom: 4px;
     }
     
     .split-right .detail-item-value {
-        font-size: 16px;
+        font-size: 14px;
     }
     
     .footer {
@@ -1243,7 +1233,7 @@ html {
     
     #searchBtn {
         justify-content: center;
-        padding: 12px 20px;
+        padding: 10px 18px;
     }
 }
 
@@ -1262,11 +1252,11 @@ html {
     }
     
     .split-left {
-        padding: 40px 16px 30px;
+        padding: 40px 16px 25px;
     }
     
     .split-right {
-        padding: 30px 16px 40px;
+        padding: 25px 16px 40px;
     }
     
     .hero h1 {
@@ -1283,56 +1273,56 @@ html {
     }
     
     .split-right .card-header {
-        padding: 16px 20px;
-        gap: 12px;
+        padding: 14px 16px;
+        gap: 10px;
     }
     
     .split-right .card-header-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-    }
-    
-    .split-right .card-header-title {
+        width: 36px;
+        height: 36px;
         font-size: 16px;
     }
     
-    .split-right .card-header-sub {
-        font-size: 10px;
-    }
-    
-    .split-right .card-badge {
-        padding: 4px 10px;
-        font-size: 10px;
-    }
-    
-    .split-right .card-details {
-        padding: 12px 20px 20px;
-        gap: 8px;
-    }
-    
-    .split-right .detail-item {
-        padding: 12px 14px;
-        gap: 12px;
-    }
-    
-    .split-right .detail-item-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-    }
-    
-    .split-right .detail-item-label {
-        font-size: 9px;
-        margin-bottom: 4px;
-    }
-    
-    .split-right .detail-item-value {
+    .split-right .card-header-title {
         font-size: 14px;
     }
     
+    .split-right .card-header-sub {
+        font-size: 9px;
+    }
+    
+    .split-right .card-badge {
+        padding: 3px 8px;
+        font-size: 9px;
+    }
+    
+    .split-right .card-details {
+        padding: 10px 16px 14px;
+        gap: 6px;
+    }
+    
+    .split-right .detail-item {
+        padding: 8px 10px;
+        gap: 10px;
+    }
+    
+    .split-right .detail-item-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .split-right .detail-item-label {
+        font-size: 8px;
+        margin-bottom: 3px;
+    }
+    
+    .split-right .detail-item-value {
+        font-size: 13px;
+    }
+    
     .footer {
-        padding: 14px 16px;
+        padding: 12px 16px;
         font-size: 11px;
     }
     
@@ -1341,8 +1331,8 @@ html {
     }
     
     ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
     }
 }
 
@@ -1357,17 +1347,17 @@ html {
     }
     
     .split-right .card-header-title {
-        font-size: 14px;
-    }
-    
-    .split-right .detail-item-value {
         font-size: 13px;
     }
     
+    .split-right .detail-item-value {
+        font-size: 12px;
+    }
+    
     .split-right .detail-item-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
     }
 }
 
@@ -1380,8 +1370,7 @@ html {
     
     .split-left,
     .split-right {
-        min-height: 100vh;
-        padding: 30px 20px;
+        padding: 25px 20px;
     }
     
     .hero h1 {
@@ -1398,54 +1387,54 @@ html {
     }
 }
 
-/* High-resolution screens (above 1600px) */
+/* High-resolution screens (above 1600px) - keep it balanced */
 @media (min-width: 1600px) {
     .split-left .hero,
     .split-left .search-panel {
-        max-width: 550px;
+        max-width: 500px;
     }
     
     .split-right .results-area {
-        max-width: 1000px;
+        max-width: 800px;
     }
     
     .split-right .card-header {
-        padding: 38px 48px;
+        padding: 22px 32px;
     }
     
     .split-right .card-header-icon {
-        width: 76px;
-        height: 76px;
-        font-size: 36px;
+        width: 52px;
+        height: 52px;
+        font-size: 26px;
     }
     
     .split-right .card-header-title {
-        font-size: 28px;
+        font-size: 20px;
     }
     
     .split-right .card-details {
-        padding: 32px 48px 48px;
-        gap: 20px;
+        padding: 18px 32px 26px;
+        gap: 12px;
     }
     
     .split-right .detail-item {
-        padding: 26px 28px;
-        gap: 24px;
+        padding: 16px 20px;
+        gap: 18px;
     }
     
     .split-right .detail-item-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
     }
     
     .split-right .detail-item-label {
-        font-size: 14px;
-        margin-bottom: 10px;
+        font-size: 11px;
+        margin-bottom: 6px;
     }
     
     .split-right .detail-item-value {
-        font-size: 24px;
+        font-size: 17px;
     }
 }
 
@@ -1469,7 +1458,3 @@ html {
         color: black;
     }
 }
-
-/* ============================================ */
-/* END OF RESPONSIVE DESIGN */
-/* ============================================ */
