@@ -283,7 +283,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Ensure loading animation shows on every search
 document.getElementById('searchInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') performSearch();
 });
