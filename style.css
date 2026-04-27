@@ -182,6 +182,7 @@ body::before {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding-right: 20px;
 }
 
 .split-right {
@@ -192,6 +193,7 @@ body::before {
     justify-content: center;
     align-items: center;
     overflow-y: auto;
+    padding-left: 20px;
 }
 
 .split-left .hero {
