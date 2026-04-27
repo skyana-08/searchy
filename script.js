@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyPl4TqynEGZcqB3wNI8FwTMMk_BWzLz4fn2MTNO0JX9npoQPJ1JWL5IhCMlzGPigxB/exec';
 
 function toggleTheme() {
     const html = document.documentElement;
