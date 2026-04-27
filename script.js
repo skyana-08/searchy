@@ -19,6 +19,11 @@ function toggleTheme() {
 
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
+    if (!searchInput) {
+        console.error('Search input not found');
+        return;
+    }
+    
     const searchTerm = searchInput.value.trim();
     const resultDiv = document.getElementById('result');
     const loadingDiv = document.getElementById('loading');
@@ -26,15 +31,17 @@ async function performSearch() {
 
     if (!searchTerm) {
         showMessage('error', 'No query entered', 'Please enter a name, CH code, or amount to search the database.', '🔍');
-        searchInput.focus();
+        if (searchInput) searchInput.focus();
         return;
     }
 
-    resultDiv.innerHTML = '';
-    loadingDiv.style.display = 'block';
-    loadingDiv.classList.add('active');
-    searchBtn.disabled = true;
-    searchInput.disabled = true;
+    if (resultDiv) resultDiv.innerHTML = '';
+    if (loadingDiv) {
+        loadingDiv.style.display = 'block';
+        loadingDiv.classList.add('active');
+    }
+    if (searchBtn) searchBtn.disabled = true;
+    if (searchInput) searchInput.disabled = true;
 
     try {
         const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
@@ -45,11 +52,13 @@ async function performSearch() {
 
         const data = await response.json();
 
-        loadingDiv.style.display = 'none';
-        loadingDiv.classList.remove('active');
-        searchBtn.disabled = false;
-        searchInput.disabled = false;
-        searchInput.focus();
+        if (loadingDiv) {
+            loadingDiv.style.display = 'none';
+            loadingDiv.classList.remove('active');
+        }
+        if (searchBtn) searchBtn.disabled = false;
+        if (searchInput) searchInput.disabled = false;
+        if (searchInput) searchInput.focus();
 
         if (data.found && data.data) {
             const allResults = data.allResults || [data.data];
@@ -66,7 +75,7 @@ async function performSearch() {
             } else {
                 exitSplitMode();
                 displayResult(data.data);
-                if (totalResults > 1) {
+                if (totalResults > 1 && document.getElementById('result')) {
                     const note = document.createElement('div');
                     note.className = 'result-card';
                     note.style.marginTop = '16px';
@@ -80,10 +89,12 @@ async function performSearch() {
         }
 
     } catch (error) {
-        loadingDiv.style.display = 'none';
-        loadingDiv.classList.remove('active');
-        searchBtn.disabled = false;
-        searchInput.disabled = false;
+        if (loadingDiv) {
+            loadingDiv.style.display = 'none';
+            loadingDiv.classList.remove('active');
+        }
+        if (searchBtn) searchBtn.disabled = false;
+        if (searchInput) searchInput.disabled = false;
         showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
         exitSplitMode();
         console.error('Search error:', error);
@@ -172,19 +183,7 @@ function renderSplitScreen(accounts) {
     isSplitMode = true;
     
     // Re-attach event listeners and restore search input value
-    const newSearchInput = document.getElementById('searchInput');
-    if (newSearchInput) {
-        newSearchInput.value = currentSearchValue;
-        newSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
-        newSearchInput.focus();
-    }
-    
-    const newSearchBtn = document.getElementById('searchBtn');
-    if (newSearchBtn) {
-        newSearchBtn.onclick = performSearch;
-    }
+    attachSearchEventListeners(currentSearchValue);
 }
 
 function exitSplitMode() {
@@ -193,6 +192,16 @@ function exitSplitMode() {
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    
+    // Store the loading element reference
+    const loadingHTML = document.getElementById('loading')?.outerHTML || `
+        <div id="loading" class="loading">
+            <div class="loading-inner">
+                <div class="loader-ring"></div>
+                <p class="loading-text">Querying database</p>
+            </div>
+        </div>
+    `;
     
     // Restore original layout
     appRoot.innerHTML = `
@@ -210,7 +219,7 @@ function exitSplitMode() {
                     </svg>
                 </span>
                 <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
-                <button id="searchBtn" onclick="performSearch()">
+                <button id="searchBtn">
                     <span class="btn-icon">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -222,12 +231,7 @@ function exitSplitMode() {
         </div>
 
         <div class="results-area">
-            <div id="loading" class="loading">
-                <div class="loading-inner">
-                    <div class="loader-ring"></div>
-                    <p class="loading-text">Querying database</p>
-                </div>
-            </div>
+            ${loadingHTML}
             <div id="result"></div>
         </div>
     `;
@@ -236,23 +240,45 @@ function exitSplitMode() {
     isSplitMode = false;
     
     // Re-attach event listeners
-    const newSearchInput = document.getElementById('searchInput');
-    if (newSearchInput) {
-        newSearchInput.value = currentSearchValue;
+    attachSearchEventListeners(currentSearchValue);
+}
+
+function attachSearchEventListeners(savedSearchValue) {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    if (searchInput) {
+        searchInput.value = savedSearchValue || '';
+        // Remove any existing event listeners to prevent duplicates
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        
+        // Add fresh event listeners to the new input
         newSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') performSearch();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
         });
         newSearchInput.focus();
     }
     
-    const newSearchBtn = document.getElementById('searchBtn');
-    if (newSearchBtn) {
-        newSearchBtn.onclick = performSearch;
+    if (searchBtn) {
+        const newSearchBtn = searchBtn.cloneNode(true);
+        if (searchBtn.parentNode) {
+            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+        }
+        newSearchBtn.onclick = function(e) {
+            e.preventDefault();
+            performSearch();
+        };
     }
 }
 
 function displayResult(data) {
     const resultDiv = document.getElementById('result');
+    if (!resultDiv) return;
+    
     resultDiv.innerHTML = `
         <div class="result-card success">
             <div class="card-header">
@@ -306,6 +332,8 @@ function displayResult(data) {
 
 function showMessage(type, title, message, icon) {
     const resultDiv = document.getElementById('result');
+    if (!resultDiv) return;
+    
     const isError = type === 'error';
     resultDiv.innerHTML = `
         <div class="result-card ${isError ? 'error' : 'success'}">
@@ -330,14 +358,23 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Global event listener that always works
+// Global event listener that always works with event delegation
 document.addEventListener('keypress', function(e) {
     if (e.key === 'Enter' && e.target.id === 'searchInput') {
+        e.preventDefault();
+        performSearch();
+    }
+});
+
+// Also listen for clicks on the search button using event delegation
+document.addEventListener('click', function(e) {
+    const searchBtn = e.target.closest('#searchBtn');
+    if (searchBtn) {
+        e.preventDefault();
         performSearch();
     }
 });
 
 window.addEventListener('load', function() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.focus();
+    attachSearchEventListeners('');
 });
