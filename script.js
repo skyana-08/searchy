@@ -193,17 +193,7 @@ function exitSplitMode() {
     const appRoot = document.getElementById('appRoot');
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
-    // Store the loading element reference
-    const loadingHTML = document.getElementById('loading')?.outerHTML || `
-        <div id="loading" class="loading">
-            <div class="loading-inner">
-                <div class="loader-ring"></div>
-                <p class="loading-text">Querying database</p>
-            </div>
-        </div>
-    `;
-    
-    // Restore original layout
+    // Restore original layout with loading animation preserved
     appRoot.innerHTML = `
         <div class="hero">
             <div class="hero-eyebrow">Field Visit Verification System</div>
@@ -231,7 +221,12 @@ function exitSplitMode() {
         </div>
 
         <div class="results-area">
-            ${loadingHTML}
+            <div id="loading" class="loading">
+                <div class="loading-inner">
+                    <div class="loader-ring"></div>
+                    <p class="loading-text">Querying database</p>
+                </div>
+            </div>
             <div id="result"></div>
         </div>
     `;
