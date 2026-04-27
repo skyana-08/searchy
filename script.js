@@ -49,13 +49,27 @@ async function performSearch() {
 
         if (data.found && data.data) {
             const allResults = data.allResults || [data.data];
-            const hasDuplicates = checkForDuplicateNameOrCode(allResults);
+            const totalResults = data.totalResults || 1;
             
-            if (allResults.length >= 2 && hasDuplicates) {
+            // Check if there are multiple accounts with same name OR same CH code
+            const hasDuplicateName = checkDuplicateName(allResults);
+            const hasDuplicateCode = checkDuplicateCode(allResults);
+            
+            // Show split screen ONLY if 2+ results AND duplicates exist
+            if (totalResults >= 2 && (hasDuplicateName || hasDuplicateCode)) {
                 renderSplitScreen(allResults);
-            } else {
-                displayResult(data.data);
+            } else if (totalResults === 1) {
+                // Single result - normal UI
                 resetToNormalLayout();
+                displayResult(data.data);
+            } else {
+                // Multiple results but no duplicates - show first one with note
+                resetToNormalLayout();
+                displayResult(data.data);
+                const note = document.createElement('div');
+                note.className = 'result-card';
+                note.innerHTML = `<div class="card-message"><p class="card-message-text"><strong>${totalResults} accounts found</strong><br>No duplicate names or CH codes. Showing first result.</p></div>`;
+                document.getElementById('result').appendChild(note);
             }
         } else {
             showMessage('error', 'Account Not Found', 'No accounts matched your search. This account is negative for field visit.', '📭');
@@ -72,14 +86,14 @@ async function performSearch() {
     }
 }
 
-function checkForDuplicateNameOrCode(accounts) {
+function checkDuplicateName(accounts) {
     const names = accounts.map(acc => acc.name?.trim().toUpperCase());
+    return new Set(names).size !== names.length;
+}
+
+function checkDuplicateCode(accounts) {
     const codes = accounts.map(acc => acc.code?.trim().toUpperCase());
-    
-    const hasDuplicateName = new Set(names).size !== names.length;
-    const hasDuplicateCode = new Set(codes).size !== codes.length;
-    
-    return hasDuplicateName || hasDuplicateCode;
+    return new Set(codes).size !== codes.length;
 }
 
 function renderSplitScreen(accounts) {
