@@ -1,5 +1,24 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
 
+/* ─── Theme Toggle ───────────────────────────────────── */
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('checkmych-theme', next);
+}
+
+(function initTheme() {
+    const saved = localStorage.getItem('checkmych-theme');
+    if (saved === 'light' || saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', saved);
+    }
+})();
+
+/* ─── Search ─────────────────────────────────────────── */
+
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
     const searchTerm = searchInput.value.trim();
@@ -78,21 +97,21 @@ function displayResult(data) {
                 <div class="detail-item">
                     <div class="detail-item-icon">📊</div>
                     <div class="detail-item-content">
-                        <div class="detail-item-label">Opening Balance (OB)</div>
+                        <div class="detail-item-label">OB — Outstanding Balance</div>
                         <div class="detail-item-value amount-val">₱${escapeHtml(data.ob)}</div>
                     </div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-item-icon">📅</div>
                     <div class="detail-item-content">
-                        <div class="detail-item-label">Payment Due (PD)</div>
+                        <div class="detail-item-label">PD — Past Due</div>
                         <div class="detail-item-value amount-val">₱${escapeHtml(data.pd)}</div>
                     </div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-item-icon">💳</div>
                     <div class="detail-item-content">
-                        <div class="detail-item-label">Minimum Amount Due (MAD)</div>
+                        <div class="detail-item-label">MAD — Minimum Amount Due</div>
                         <div class="detail-item-value amount-val">₱${escapeHtml(data.mad)}</div>
                     </div>
                 </div>
