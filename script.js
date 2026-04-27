@@ -17,7 +17,11 @@ function toggleTheme() {
     }
 })();
 
+// Make performSearch globally available
+window.performSearch = performSearch;
+
 async function performSearch() {
+    console.log('performSearch called'); // Debug log
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) {
         console.error('Search input not found');
@@ -182,8 +186,10 @@ function renderSplitScreen(accounts) {
     mainElement.classList.add('split-mode');
     isSplitMode = true;
     
-    // Re-attach event listeners and restore search input value
-    attachSearchEventListeners(currentSearchValue);
+    // Re-attach event listeners
+    setTimeout(() => {
+        attachEventListeners(currentSearchValue);
+    }, 0);
 }
 
 function exitSplitMode() {
@@ -193,7 +199,7 @@ function exitSplitMode() {
     const appRoot = document.getElementById('appRoot');
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
-    // Restore original layout with loading animation preserved
+    // Restore original layout
     appRoot.innerHTML = `
         <div class="hero">
             <div class="hero-eyebrow">Field Visit Verification System</div>
@@ -235,27 +241,31 @@ function exitSplitMode() {
     isSplitMode = false;
     
     // Re-attach event listeners
-    attachSearchEventListeners(currentSearchValue);
+    setTimeout(() => {
+        attachEventListeners(currentSearchValue);
+    }, 0);
 }
 
-function attachSearchEventListeners(savedSearchValue) {
+function attachEventListeners(savedSearchValue) {
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
     
     if (searchInput) {
         searchInput.value = savedSearchValue || '';
-        // Remove any existing event listeners to prevent duplicates
+        // Remove old event listener by replacing with a clone
         const newSearchInput = searchInput.cloneNode(true);
-        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-        
-        // Add fresh event listeners to the new input
+        if (searchInput.parentNode) {
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        }
+        // Add new event listener
         newSearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 performSearch();
             }
         });
-        newSearchInput.focus();
+        // Focus the input
+        setTimeout(() => newSearchInput.focus(), 0);
     }
     
     if (searchBtn) {
@@ -263,10 +273,11 @@ function attachSearchEventListeners(savedSearchValue) {
         if (searchBtn.parentNode) {
             searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
         }
-        newSearchBtn.onclick = function(e) {
+        // Add click event listener
+        newSearchBtn.addEventListener('click', function(e) {
             e.preventDefault();
             performSearch();
-        };
+        });
     }
 }
 
@@ -353,23 +364,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Global event listener that always works with event delegation
-document.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter' && e.target.id === 'searchInput') {
-        e.preventDefault();
-        performSearch();
-    }
-});
-
-// Also listen for clicks on the search button using event delegation
-document.addEventListener('click', function(e) {
-    const searchBtn = e.target.closest('#searchBtn');
-    if (searchBtn) {
-        e.preventDefault();
-        performSearch();
-    }
-});
-
+// Initialize on page load
 window.addEventListener('load', function() {
-    attachSearchEventListeners('');
+    attachEventListeners('');
 });
