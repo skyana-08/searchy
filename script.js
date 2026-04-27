@@ -1,6 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxw6NiMWTNectCt2eRYlF1BBnSN5pM0sf5Y9eFmchTM1Hs1Atf2e2v2dxBan8HFxy9d/exec';
-
-/* ─── Theme Toggle ───────────────────────────────────── */
+const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -17,8 +15,6 @@ function toggleTheme() {
     }
 })();
 
-/* ─── Search ─────────────────────────────────────────── */
-
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
     const searchTerm = searchInput.value.trim();
@@ -32,7 +28,6 @@ async function performSearch() {
         return;
     }
 
-    // Clear previous results and show loading animation INSIDE results area
     resultDiv.innerHTML = '';
     loadingDiv.style.display = 'block';
     loadingDiv.classList.add('active');
@@ -48,7 +43,6 @@ async function performSearch() {
 
         const data = await response.json();
 
-        // Hide loading animation
         loadingDiv.style.display = 'none';
         loadingDiv.classList.remove('active');
         searchBtn.disabled = false;
@@ -56,25 +50,21 @@ async function performSearch() {
         searchInput.focus();
 
         if (data.found && data.data) {
-            // Get all results from API
             const allResults = data.allResults || [data.data];
             const totalResults = data.totalResults || 1;
             
-            // Check if there are duplicate names OR duplicate CH codes
             const names = allResults.map(acc => acc.name?.trim().toUpperCase());
             const codes = allResults.map(acc => acc.code?.trim().toUpperCase());
             const hasDuplicateName = new Set(names).size !== names.length;
             const hasDuplicateCode = new Set(codes).size !== codes.length;
             const hasDuplicates = hasDuplicateName || hasDuplicateCode;
             
-            // If 2+ results AND duplicates exist, show split screen
             if (totalResults >= 2 && hasDuplicates) {
                 renderSplitScreen(allResults);
             } else {
-                // Normal UI - single result or no duplicates
-                resetToNormalLayout();
+                // Reset to normal UI (no reload needed)
+                removeSplitMode();
                 displayResult(data.data);
-                // If multiple results but no duplicates, show a note
                 if (totalResults > 1) {
                     const note = document.createElement('div');
                     note.className = 'result-card';
@@ -85,7 +75,7 @@ async function performSearch() {
             }
         } else {
             showMessage('error', 'Account Not Found', 'No accounts matched your search. This account is negative for field visit.', '📭');
-            resetToNormalLayout();
+            removeSplitMode();
         }
 
     } catch (error) {
@@ -94,7 +84,7 @@ async function performSearch() {
         searchBtn.disabled = false;
         searchInput.disabled = false;
         showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
-        resetToNormalLayout();
+        removeSplitMode();
         console.error('Search error:', error);
     }
 }
@@ -106,7 +96,6 @@ function renderSplitScreen(accounts) {
     
     let resultsHTML = '<div class="results-area">';
     accounts.forEach((account, index) => {
-        // Add animation delay for each result card
         const delay = index * 0.1;
         resultsHTML += `
             <div class="result-card success" style="animation: fadeSlide 0.35s ease ${delay}s both;">
@@ -160,46 +149,40 @@ function renderSplitScreen(accounts) {
     });
     resultsHTML += '</div>';
     
-    // Smooth transition - fade out old content first
-    mainElement.style.opacity = '0';
-    setTimeout(() => {
-        mainElement.innerHTML = `
-            <div class="split-container">
-                <div class="split-left">
-                    ${heroHTML}
-                    ${searchPanelHTML}
-                </div>
-                <div class="split-right">
-                    ${resultsHTML}
-                </div>
+    mainElement.innerHTML = `
+        <div class="split-container">
+            <div class="split-left">
+                ${heroHTML}
+                ${searchPanelHTML}
             </div>
-        `;
-        mainElement.classList.add('split-mode');
-        mainElement.style.opacity = '1';
-        
-        // Re-attach event listeners
-        const newSearchInput = document.getElementById('searchInput');
-        if (newSearchInput) {
-            newSearchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') performSearch();
-            });
-            newSearchInput.focus();
-        }
-        
-        const newSearchBtn = document.getElementById('searchBtn');
-        if (newSearchBtn) {
-            newSearchBtn.onclick = performSearch;
-        }
-    }, 200);
+            <div class="split-right">
+                ${resultsHTML}
+            </div>
+        </div>
+    `;
+    mainElement.classList.add('split-mode');
+    
+    // Re-attach event listeners for new search input
+    const newSearchInput = document.getElementById('searchInput');
+    if (newSearchInput) {
+        newSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+        newSearchInput.focus();
+    }
+    
+    const newSearchBtn = document.getElementById('searchBtn');
+    if (newSearchBtn) {
+        newSearchBtn.onclick = performSearch;
+    }
 }
 
-function resetToNormalLayout() {
+function removeSplitMode() {
     const mainElement = document.querySelector('.main');
     if (mainElement.classList.contains('split-mode')) {
-        mainElement.style.opacity = '0';
-        setTimeout(() => {
-            location.reload();
-        }, 200);
+        // Don't reload, just remove split mode and restore original structure
+        mainElement.classList.remove('split-mode');
+        // The original structure is still there, we just need to make sure we're not in split mode
     }
 }
 
