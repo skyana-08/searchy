@@ -203,9 +203,9 @@ body::before {
 .footer { padding: 18px 48px; border-top: 1px solid var(--border-nav); display: flex; justify-content: space-between; background: var(--bg-footer); font-size: 12px; }
 .footer-tip kbd { padding: 2px 6px; background: var(--kbd-bg); border-radius: 4px; }
 
-/* SPLIT SCREEN MODE - UPDATED FOR CENTERING */
+/* SPLIT SCREEN MODE - WIDER RIGHT PANEL */
 .split-mode { 
-    max-width: 1400px; 
+    max-width: 1600px; 
     width: 100%; 
     margin: 0 auto; 
     padding: 40px 24px 60px !important; 
@@ -215,69 +215,29 @@ body::before {
     display: flex; 
     gap: 40px; 
     width: 100%; 
-    align-items: flex-start;
 }
 
 .split-left { 
-    flex: 1; 
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.split-left .hero {
-    width: 100%;
-    max-width: 580px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.split-left .search-panel {
-    width: 100%;
-    max-width: 580px;
-    margin-left: auto;
-    margin-right: auto;
+    flex: 0.8; 
+    min-width: 0; 
 }
 
 .split-right { 
-    flex: 1; 
+    flex: 1.2; 
     min-width: 0; 
     max-height: 70vh; 
     overflow-y: auto; 
     padding-right: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .split-right .results-area { 
     max-width: 100%; 
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .split-right .result-card { 
     box-shadow: none; 
     border: 1px solid var(--border-detail);
     width: 100%;
-    max-width: 580px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.split-right .result-card .card-header {
-    padding: 20px 24px;
-}
-
-.split-right .result-card .card-details {
-    padding: 16px 24px 24px;
-}
-
-.split-right .result-card:not(:last-child) {
-    margin-bottom: 20px;
 }
 
 .results-area .loading.active { display: block; }
@@ -417,13 +377,6 @@ html {
     .split-right { 
         max-height: none;
         padding-right: 0;
-    }
-    .split-right .result-card {
-        max-width: 100%;
-    }
-    .split-left .hero,
-    .split-left .search-panel {
-        max-width: 100%;
     }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
     
