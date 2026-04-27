@@ -37,12 +37,9 @@ async function performSearch() {
         return;
     }
 
-    // Clear previous results
     if (resultDiv) resultDiv.innerHTML = '';
     
-    // Ensure loading element exists and show it
     if (!loadingDiv) {
-        // Create loading element if it doesn't exist
         const resultsArea = document.querySelector('.results-area');
         if (resultsArea) {
             const loadingHTML = `
@@ -75,7 +72,6 @@ async function performSearch() {
 
         const data = await response.json();
 
-        // Hide loading
         if (loadingDiv) {
             loadingDiv.style.display = 'none';
             loadingDiv.classList.remove('active');
@@ -130,7 +126,6 @@ function renderSplitScreen(accounts) {
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
     
-    // Store the current search input value
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
     let resultsHTML = '<div class="results-area" id="splitResultsArea">';
@@ -192,11 +187,9 @@ function renderSplitScreen(accounts) {
     });
     resultsHTML += '</div>';
     
-    // Get the hero and search panel HTML
     const heroHTML = document.querySelector('.hero')?.outerHTML || '';
     const searchPanelHTML = document.querySelector('.search-panel')?.outerHTML || '';
     
-    // Replace the content with split layout
     appRoot.innerHTML = `
         <div class="split-container">
             <div class="split-left">
@@ -212,7 +205,6 @@ function renderSplitScreen(accounts) {
     mainElement.classList.add('split-mode');
     isSplitMode = true;
     
-    // Re-attach event listeners
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
     }, 0);
@@ -225,7 +217,6 @@ function exitSplitMode() {
     const appRoot = document.getElementById('appRoot');
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
-    // Restore original layout with loading element
     appRoot.innerHTML = `
         <div class="hero">
             <div class="hero-eyebrow">Field Visit Verification System</div>
@@ -266,7 +257,6 @@ function exitSplitMode() {
     mainElement.classList.remove('split-mode');
     isSplitMode = false;
     
-    // Re-attach event listeners
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
     }, 0);
@@ -278,19 +268,16 @@ function attachEventListeners(savedSearchValue) {
     
     if (searchInput) {
         searchInput.value = savedSearchValue || '';
-        // Remove old event listener by replacing with a clone
         const newSearchInput = searchInput.cloneNode(true);
         if (searchInput.parentNode) {
             searchInput.parentNode.replaceChild(newSearchInput, searchInput);
         }
-        // Add new event listener
         newSearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 performSearch();
             }
         });
-        // Focus the input
         setTimeout(() => newSearchInput.focus(), 0);
     }
     
@@ -299,7 +286,6 @@ function attachEventListeners(savedSearchValue) {
         if (searchBtn.parentNode) {
             searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
         }
-        // Add click event listener
         newSearchBtn.addEventListener('click', function(e) {
             e.preventDefault();
             performSearch();
@@ -390,7 +376,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Initialize on page load
 window.addEventListener('load', function() {
     attachEventListeners('');
 });
