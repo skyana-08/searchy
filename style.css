@@ -156,28 +156,25 @@ body::before {
 [data-theme="light"] .theme-icon-light { display: block; }
 
 .main {
-    position: relative; z-index: 1; flex: 1; display: flex;
-    align-items: center;
+    position: relative; z-index: 1; flex: 1;
     padding: 64px 24px 80px;
 }
 
-/* SPLIT SCREEN MODE - Both columns vertically centered */
+/* SPLIT SCREEN MODE - Two separate columns, each positioned on opposite sides */
 .split-mode { 
-    max-width: 1600px; 
     width: 100%; 
-    margin: 0 auto; 
     padding: 40px 24px 60px !important; 
 }
 
 .split-container { 
     display: flex; 
-    gap: 40px; 
     width: 100%;
-    align-items: stretch;
+    justify-content: space-between;
+    gap: 40px;
 }
 
 .split-left { 
-    flex: 0.8; 
+    flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -186,25 +183,25 @@ body::before {
 }
 
 .split-right { 
-    flex: 1.2; 
+    flex: 1;
     min-width: 0; 
     max-height: 70vh; 
     overflow-y: auto; 
-    padding-right: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .split-left .hero {
     width: 100%;
-    max-width: 580px;
+    max-width: 500px;
     margin-bottom: 0;
 }
 
 .split-left .search-panel {
     width: 100%;
-    max-width: 580px;
+    max-width: 500px;
     margin-bottom: 0;
     margin-top: 32px;
 }
@@ -212,6 +209,7 @@ body::before {
 .split-right .results-area { 
     max-width: 100%; 
     width: 100%;
+    max-width: 600px;
 }
 
 .split-right .result-card { 
@@ -222,8 +220,29 @@ body::before {
 
 .results-area .loading.active { display: block; }
 
+/* Custom scrollbar for split right */
+.split-right::-webkit-scrollbar {
+    width: 8px;
+}
+
+.split-right::-webkit-scrollbar-track {
+    background: var(--bg-detail-item);
+    border-radius: 10px;
+    margin: 4px;
+}
+
+.split-right::-webkit-scrollbar-thumb {
+    background: var(--sb-blue-400);
+    border-radius: 10px;
+}
+
+.split-right::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-blue-600);
+}
+
 /* Default main content styling (non-split mode) */
 .main:not(.split-mode) {
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -302,25 +321,6 @@ body::before {
     scrollbar-color: var(--sb-blue-500) var(--bg-input);
 }
 
-.split-right::-webkit-scrollbar {
-    width: 8px;
-}
-
-.split-right::-webkit-scrollbar-track {
-    background: var(--bg-detail-item);
-    border-radius: 10px;
-    margin: 4px;
-}
-
-.split-right::-webkit-scrollbar-thumb {
-    background: var(--sb-blue-400);
-    border-radius: 10px;
-}
-
-.split-right::-webkit-scrollbar-thumb:hover {
-    background: var(--sb-blue-600);
-}
-
 html {
     scroll-behavior: smooth;
 }
@@ -366,11 +366,6 @@ html {
     background: var(--sb-blue-600);
 }
 
-.split-right {
-    scrollbar-width: thin;
-    scrollbar-color: var(--sb-blue-400) var(--bg-detail-item);
-}
-
 ::-webkit-scrollbar-corner {
     background: var(--bg-base);
 }
@@ -401,11 +396,6 @@ html {
     #searchInput { text-align: center; padding: 12px; }
     #searchBtn { justify-content: center; }
     
-    .split-mode {
-        min-height: auto;
-        align-items: flex-start;
-    }
-    
     .split-container { 
         flex-direction: column; 
         gap: 30px;
@@ -417,7 +407,6 @@ html {
     
     .split-right { 
         max-height: none;
-        padding-right: 0;
         justify-content: flex-start;
     }
     
