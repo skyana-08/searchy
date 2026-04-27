@@ -1,5 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
 
+/* ─── Theme Toggle ───────────────────────────────────── */
+
 function toggleTheme() {
     const html = document.documentElement;
     const current = html.getAttribute('data-theme');
@@ -14,6 +16,8 @@ function toggleTheme() {
         document.documentElement.setAttribute('data-theme', saved);
     }
 })();
+
+/* ─── Search ─────────────────────────────────────────── */
 
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -35,41 +39,44 @@ async function performSearch() {
 
     try {
         const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-        
+
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
         searchInput.disabled = false;
         searchInput.focus();
 
         if (data.found && data.data) {
+            // Get all results (if available from API)
             const allResults = data.allResults || [data.data];
             const totalResults = data.totalResults || 1;
             
-            // Check if there are multiple accounts with same name OR same CH code
-            const hasDuplicateName = checkDuplicateName(allResults);
-            const hasDuplicateCode = checkDuplicateCode(allResults);
+            // Check if there are duplicate names OR duplicate CH codes
+            const names = allResults.map(acc => acc.name?.trim().toUpperCase());
+            const codes = allResults.map(acc => acc.code?.trim().toUpperCase());
+            const hasDuplicateName = new Set(names).size !== names.length;
+            const hasDuplicateCode = new Set(codes).size !== codes.length;
+            const hasDuplicates = hasDuplicateName || hasDuplicateCode;
             
-            // Show split screen ONLY if 2+ results AND duplicates exist
-            if (totalResults >= 2 && (hasDuplicateName || hasDuplicateCode)) {
+            // If 2+ results AND duplicates exist, show split screen
+            if (totalResults >= 2 && hasDuplicates) {
                 renderSplitScreen(allResults);
-            } else if (totalResults === 1) {
-                // Single result - normal UI
-                resetToNormalLayout();
-                displayResult(data.data);
             } else {
-                // Multiple results but no duplicates - show first one with note
+                // Normal UI - single result or no duplicates
                 resetToNormalLayout();
                 displayResult(data.data);
-                const note = document.createElement('div');
-                note.className = 'result-card';
-                note.innerHTML = `<div class="card-message"><p class="card-message-text"><strong>${totalResults} accounts found</strong><br>No duplicate names or CH codes. Showing first result.</p></div>`;
-                document.getElementById('result').appendChild(note);
+                // If multiple results but no duplicates, show a note
+                if (totalResults > 1) {
+                    const note = document.createElement('div');
+                    note.className = 'result-card';
+                    note.innerHTML = `<div class="card-message"><p class="card-message-text"><strong>${totalResults} accounts found</strong><br>No duplicate names or CH codes. Showing first result.</p></div>`;
+                    document.getElementById('result').appendChild(note);
+                }
             }
         } else {
             showMessage('error', 'Account Not Found', 'No accounts matched your search. This account is negative for field visit.', '📭');
@@ -86,20 +93,10 @@ async function performSearch() {
     }
 }
 
-function checkDuplicateName(accounts) {
-    const names = accounts.map(acc => acc.name?.trim().toUpperCase());
-    return new Set(names).size !== names.length;
-}
-
-function checkDuplicateCode(accounts) {
-    const codes = accounts.map(acc => acc.code?.trim().toUpperCase());
-    return new Set(codes).size !== codes.length;
-}
-
 function renderSplitScreen(accounts) {
     const mainElement = document.querySelector('.main');
     const heroHTML = document.querySelector('.hero').outerHTML;
-    const searchPanelHTML = document.getElementById('searchPanelWrapper').innerHTML;
+    const searchPanelHTML = document.querySelector('.search-panel').outerHTML;
     
     let resultsHTML = '<div class="results-area">';
     accounts.forEach(account => {
@@ -156,7 +153,7 @@ function renderSplitScreen(accounts) {
     resultsHTML += '</div>';
     
     mainElement.innerHTML = `
-        <div class="split-layout">
+        <div class="split-container">
             <div class="split-left">
                 ${heroHTML}
                 ${searchPanelHTML}
@@ -167,6 +164,9 @@ function renderSplitScreen(accounts) {
         </div>
     `;
     
+    mainElement.classList.add('split-mode');
+    
+    // Re-attach event listeners
     const newSearchInput = document.getElementById('searchInput');
     if (newSearchInput) {
         newSearchInput.addEventListener('keypress', function(e) {
@@ -183,7 +183,7 @@ function renderSplitScreen(accounts) {
 
 function resetToNormalLayout() {
     const mainElement = document.querySelector('.main');
-    if (mainElement.querySelector('.split-layout')) {
+    if (mainElement.classList.contains('split-mode')) {
         location.reload();
     }
 }
@@ -244,7 +244,7 @@ function displayResult(data) {
 function showMessage(type, title, message, icon) {
     const resultDiv = document.getElementById('result');
     const isError = type === 'error';
-    
+
     resultDiv.innerHTML = `
         <div class="result-card ${isError ? 'error' : 'success'}">
             <div class="card-header">
@@ -268,10 +268,20 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-document.getElementById('searchInput').addEventListener('keypress', function(e) {
+function focusSearch() {
+    document.getElementById('searchInput').focus();
+}
+
+function prefillSearch(val) {
+    const input = document.getElementById('searchInput');
+    input.value = val;
+    input.focus();
+}
+
+document.getElementById('searchInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') performSearch();
 });
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     document.getElementById('searchInput').focus();
 });
