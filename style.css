@@ -157,40 +157,39 @@ body::before {
 
 .main {
     position: relative; z-index: 1; flex: 1;
-    padding: 64px 24px 80px;
+    padding: 0;
 }
 
-/* SPLIT SCREEN MODE - Two separate columns, each positioned on opposite sides */
+/* SPLIT SCREEN MODE */
 .split-mode { 
     width: 100%; 
-    padding: 40px 24px 60px !important; 
+    height: calc(100vh - 56px);
+    padding: 0 !important;
 }
 
 .split-container { 
     display: flex; 
     width: 100%;
-    justify-content: space-between;
-    gap: 40px;
+    height: 100%;
 }
 
 .split-left { 
     flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 40px;
 }
 
 .split-right { 
     flex: 1;
-    min-width: 0; 
-    max-height: 70vh; 
-    overflow-y: auto; 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 40px;
+    overflow-y: auto;
 }
 
 .split-left .hero {
@@ -209,13 +208,54 @@ body::before {
 .split-right .results-area { 
     max-width: 100%; 
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;
 }
 
 .split-right .result-card { 
     box-shadow: none; 
     border: 1px solid var(--border-detail);
     width: 100%;
+    margin-bottom: 0;
+}
+
+/* Make result card larger and wider */
+.split-right .card-header {
+    padding: 28px 32px;
+}
+
+.split-right .card-header-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 26px;
+}
+
+.split-right .card-header-title {
+    font-size: 20px;
+}
+
+.split-right .card-details {
+    padding: 24px 32px 32px;
+    gap: 12px;
+}
+
+.split-right .detail-item {
+    padding: 18px 20px;
+    gap: 18px;
+}
+
+.split-right .detail-item-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+}
+
+.split-right .detail-item-label {
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.split-right .detail-item-value {
+    font-size: 18px;
 }
 
 .results-area .loading.active { display: block; }
@@ -246,6 +286,7 @@ body::before {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    padding: 64px 24px 80px;
 }
 
 .hero { text-align: center; margin-bottom: 48px; max-width: 580px; }
@@ -388,33 +429,42 @@ html {
 
 @media (max-width: 860px) {
     .topbar { padding: 0 18px; }
-    .main { padding: 40px 16px 60px; }
-    .hero { margin-bottom: 32px; }
-    .hero h1 { font-size: 2rem; }
-    .search-field { flex-direction: column; align-items: stretch; padding: 6px; }
-    .search-field-icon { display: none; }
-    #searchInput { text-align: center; padding: 12px; }
-    #searchBtn { justify-content: center; }
+    
+    .split-mode {
+        height: auto;
+        min-height: calc(100vh - 56px);
+    }
     
     .split-container { 
         flex-direction: column; 
-        gap: 30px;
     }
     
-    .split-left {
-        justify-content: flex-start;
+    .split-left, .split-right {
+        padding: 40px 24px;
+        min-height: 50vh;
     }
     
-    .split-right { 
-        max-height: none;
-        justify-content: flex-start;
+    .split-right .result-card {
+        max-width: 100%;
     }
     
-    .split-left .search-panel {
-        margin-top: 16px;
+    .split-right .card-header {
+        padding: 20px 24px;
     }
     
-    .footer { flex-direction: column; text-align: center; gap: 8px; }
+    .split-right .card-details {
+        padding: 16px 24px 24px;
+    }
+    
+    .split-right .detail-item {
+        padding: 14px 16px;
+    }
+    
+    .split-right .detail-item-value {
+        font-size: 15px;
+    }
+    
+    .footer { flex-direction: column; text-align: center; gap: 8px; padding: 18px 24px; }
     
     ::-webkit-scrollbar {
         width: 6px;
