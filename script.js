@@ -17,11 +17,9 @@ function toggleTheme() {
     }
 })();
 
-// Make performSearch globally available
 window.performSearch = performSearch;
 
 async function performSearch() {
-    console.log('performSearch called'); // Debug log
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) {
         console.error('Search input not found');
@@ -30,7 +28,7 @@ async function performSearch() {
     
     const searchTerm = searchInput.value.trim();
     const resultDiv = document.getElementById('result');
-    const loadingDiv = document.getElementById('loading');
+    let loadingDiv = document.getElementById('loading');
     const searchBtn = document.getElementById('searchBtn');
 
     if (!searchTerm) {
@@ -39,11 +37,32 @@ async function performSearch() {
         return;
     }
 
+    // Clear previous results
     if (resultDiv) resultDiv.innerHTML = '';
+    
+    // Ensure loading element exists and show it
+    if (!loadingDiv) {
+        // Create loading element if it doesn't exist
+        const resultsArea = document.querySelector('.results-area');
+        if (resultsArea) {
+            const loadingHTML = `
+                <div id="loading" class="loading">
+                    <div class="loading-inner">
+                        <div class="loader-ring"></div>
+                        <p class="loading-text">Querying database</p>
+                    </div>
+                </div>
+            `;
+            resultsArea.insertAdjacentHTML('afterbegin', loadingHTML);
+            loadingDiv = document.getElementById('loading');
+        }
+    }
+    
     if (loadingDiv) {
         loadingDiv.style.display = 'block';
         loadingDiv.classList.add('active');
     }
+    
     if (searchBtn) searchBtn.disabled = true;
     if (searchInput) searchInput.disabled = true;
 
@@ -56,10 +75,12 @@ async function performSearch() {
 
         const data = await response.json();
 
+        // Hide loading
         if (loadingDiv) {
             loadingDiv.style.display = 'none';
             loadingDiv.classList.remove('active');
         }
+        
         if (searchBtn) searchBtn.disabled = false;
         if (searchInput) searchInput.disabled = false;
         if (searchInput) searchInput.focus();
@@ -112,7 +133,12 @@ function renderSplitScreen(accounts) {
     // Store the current search input value
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
-    let resultsHTML = '<div class="results-area">';
+    let resultsHTML = '<div class="results-area" id="splitResultsArea">';
+    resultsHTML += '<div id="loading" class="loading" style="display: none;">';
+    resultsHTML += '<div class="loading-inner"><div class="loader-ring"></div><p class="loading-text">Querying database</p></div>';
+    resultsHTML += '</div>';
+    resultsHTML += '<div id="result"></div>';
+    
     accounts.forEach((account, index) => {
         resultsHTML += `
             <div class="result-card success">
@@ -199,7 +225,7 @@ function exitSplitMode() {
     const appRoot = document.getElementById('appRoot');
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
-    // Restore original layout
+    // Restore original layout with loading element
     appRoot.innerHTML = `
         <div class="hero">
             <div class="hero-eyebrow">Field Visit Verification System</div>
