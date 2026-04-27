@@ -203,7 +203,7 @@ body::before {
 .footer { padding: 18px 48px; border-top: 1px solid var(--border-nav); display: flex; justify-content: space-between; background: var(--bg-footer); font-size: 12px; }
 .footer-tip kbd { padding: 2px 6px; background: var(--kbd-bg); border-radius: 4px; }
 
-/* SPLIT SCREEN MODE - WIDER RIGHT PANEL */
+/* SPLIT SCREEN MODE - WITH VERTICAL CENTERING */
 .split-mode { 
     max-width: 1600px; 
     width: 100%; 
@@ -215,6 +215,8 @@ body::before {
     display: flex; 
     gap: 40px; 
     width: 100%; 
+    align-items: center;
+    min-height: calc(100vh - 200px);
 }
 
 .split-left { 
@@ -228,10 +230,14 @@ body::before {
     max-height: 70vh; 
     overflow-y: auto; 
     padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .split-right .results-area { 
     max-width: 100%; 
+    width: 100%;
 }
 
 .split-right .result-card { 
@@ -373,10 +379,12 @@ html {
     .split-container { 
         flex-direction: column; 
         gap: 30px;
+        min-height: auto;
     }
     .split-right { 
         max-height: none;
         padding-right: 0;
+        justify-content: flex-start;
     }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
     
