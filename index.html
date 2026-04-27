@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SB Account Checker — Field Visit Database">
+    <meta name="description" content="SBC CH Code Checker — Field Visit Database">
     <title>CheckMyCH | Field Visit Database</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,9 +21,12 @@
             <span class="topbar-name">Check<span>MyCH</span></span>
         </div>
         <div class="topbar-right">
+            <!-- Live status merged into topbar -->
             <div class="topbar-status">
                 <div class="status-dot"></div>
                 <span>Database Connected</span>
+                <span class="status-divider">·</span>
+                <span class="status-live">Live</span>
             </div>
             <!-- Dark/Light mode toggle -->
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
@@ -68,54 +71,17 @@
                     <span>Search</span>
                 </button>
             </div>
-
-            <div class="search-tags">
-                <span class="search-tags-label">Search by:</span>
-                <button class="tag" onclick="focusSearch()">👤 Account Name</button>
-                <button class="tag" onclick="prefillSearch('CH')">🏷️ CH Code</button>
-                <button class="tag" onclick="focusSearch()">💳 Amount</button>
-            </div>
         </div>
 
         <!-- Results area -->
         <div class="results-area">
-            <!-- Loading -->
             <div id="loading" class="loading">
                 <div class="loading-inner">
                     <div class="loader-ring"></div>
                     <p class="loading-text">Querying database</p>
                 </div>
             </div>
-
-            <!-- Result -->
             <div id="result"></div>
-        </div>
-
-        <!-- Abbreviation legend -->
-        <div class="abbrev-legend">
-            <span class="abbrev-legend-title">Abbreviations:</span>
-            <span class="abbrev-pill" title="Outstanding Balance">OB <span class="abbrev-full">Outstanding Balance</span></span>
-            <span class="abbrev-pill" title="Past Due">PD <span class="abbrev-full">Past Due</span></span>
-            <span class="abbrev-pill" title="Minimum Amount Due">MAD <span class="abbrev-full">Minimum Amount Due</span></span>
-        </div>
-
-        <!-- Stats chips -->
-        <div class="stats-bar">
-            <div class="stat-chip">
-                <span class="stat-chip-label">System Status</span>
-                <span class="stat-chip-value live">
-                    <span class="live-dot"></span>
-                    Live
-                </span>
-            </div>
-            <div class="stat-chip">
-                <span class="stat-chip-label">Data Source</span>
-                <span class="stat-chip-value small">Google Sheets</span>
-            </div>
-            <div class="stat-chip">
-                <span class="stat-chip-label">Search Mode</span>
-                <span class="stat-chip-value small">Full-text</span>
-            </div>
         </div>
     </main>
 
