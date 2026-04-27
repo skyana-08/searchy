@@ -354,18 +354,12 @@ body::before {
 
 [data-theme="dark"] .hero h1 em {
     font-style: italic;
-    background: linear-gradient(135deg, var(--sb-green-300) 0%, var(--sb-green-400) 60%, var(--sb-green-500) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--sb-green-400);
 }
 
 [data-theme="light"] .hero h1 em {
     font-style: italic;
-    background: linear-gradient(135deg, var(--sb-blue-600) 0%, var(--sb-green-600) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--sb-blue-600);
 }
 
 .hero-sub {
