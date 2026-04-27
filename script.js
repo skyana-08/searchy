@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbx1uUrVp0-2UFwayUP7NuWBbKNE4rpkLohc1wc95usmw-sjiUTqZNOXtoSDlH3tR_Cx/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyfqad__CWnNJAmpiqNYM3msttU9PraIHospUDmBzjcbpuf-ZuDe0T6N_Au2Hm6U7nZ/exec';
 
 /* ─── Theme Toggle ───────────────────────────────────── */
 
@@ -32,8 +32,10 @@ async function performSearch() {
         return;
     }
 
-    loadingDiv.style.display = 'block';
+    // Clear previous results and show loading animation INSIDE results area
     resultDiv.innerHTML = '';
+    loadingDiv.style.display = 'block';
+    loadingDiv.classList.add('active');
     searchBtn.disabled = true;
     searchInput.disabled = true;
 
@@ -46,13 +48,15 @@ async function performSearch() {
 
         const data = await response.json();
 
+        // Hide loading animation
         loadingDiv.style.display = 'none';
+        loadingDiv.classList.remove('active');
         searchBtn.disabled = false;
         searchInput.disabled = false;
         searchInput.focus();
 
         if (data.found && data.data) {
-            // Get all results (if available from API)
+            // Get all results from API
             const allResults = data.allResults || [data.data];
             const totalResults = data.totalResults || 1;
             
@@ -74,6 +78,7 @@ async function performSearch() {
                 if (totalResults > 1) {
                     const note = document.createElement('div');
                     note.className = 'result-card';
+                    note.style.marginTop = '16px';
                     note.innerHTML = `<div class="card-message"><p class="card-message-text"><strong>${totalResults} accounts found</strong><br>No duplicate names or CH codes. Showing first result.</p></div>`;
                     document.getElementById('result').appendChild(note);
                 }
@@ -85,6 +90,7 @@ async function performSearch() {
 
     } catch (error) {
         loadingDiv.style.display = 'none';
+        loadingDiv.classList.remove('active');
         searchBtn.disabled = false;
         searchInput.disabled = false;
         showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
@@ -99,9 +105,11 @@ function renderSplitScreen(accounts) {
     const searchPanelHTML = document.querySelector('.search-panel').outerHTML;
     
     let resultsHTML = '<div class="results-area">';
-    accounts.forEach(account => {
+    accounts.forEach((account, index) => {
+        // Add animation delay for each result card
+        const delay = index * 0.1;
         resultsHTML += `
-            <div class="result-card success">
+            <div class="result-card success" style="animation: fadeSlide 0.35s ease ${delay}s both;">
                 <div class="card-header">
                     <div class="card-header-icon">✓</div>
                     <div class="card-header-info">
@@ -152,46 +160,53 @@ function renderSplitScreen(accounts) {
     });
     resultsHTML += '</div>';
     
-    mainElement.innerHTML = `
-        <div class="split-container">
-            <div class="split-left">
-                ${heroHTML}
-                ${searchPanelHTML}
+    // Smooth transition - fade out old content first
+    mainElement.style.opacity = '0';
+    setTimeout(() => {
+        mainElement.innerHTML = `
+            <div class="split-container">
+                <div class="split-left">
+                    ${heroHTML}
+                    ${searchPanelHTML}
+                </div>
+                <div class="split-right">
+                    ${resultsHTML}
+                </div>
             </div>
-            <div class="split-right">
-                ${resultsHTML}
-            </div>
-        </div>
-    `;
-    
-    mainElement.classList.add('split-mode');
-    
-    // Re-attach event listeners
-    const newSearchInput = document.getElementById('searchInput');
-    if (newSearchInput) {
-        newSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
-        newSearchInput.focus();
-    }
-    
-    const newSearchBtn = document.getElementById('searchBtn');
-    if (newSearchBtn) {
-        newSearchBtn.onclick = performSearch;
-    }
+        `;
+        mainElement.classList.add('split-mode');
+        mainElement.style.opacity = '1';
+        
+        // Re-attach event listeners
+        const newSearchInput = document.getElementById('searchInput');
+        if (newSearchInput) {
+            newSearchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') performSearch();
+            });
+            newSearchInput.focus();
+        }
+        
+        const newSearchBtn = document.getElementById('searchBtn');
+        if (newSearchBtn) {
+            newSearchBtn.onclick = performSearch;
+        }
+    }, 200);
 }
 
 function resetToNormalLayout() {
     const mainElement = document.querySelector('.main');
     if (mainElement.classList.contains('split-mode')) {
-        location.reload();
+        mainElement.style.opacity = '0';
+        setTimeout(() => {
+            location.reload();
+        }, 200);
     }
 }
 
 function displayResult(data) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = `
-        <div class="result-card success">
+        <div class="result-card success" style="animation: fadeSlide 0.35s ease;">
             <div class="card-header">
                 <div class="card-header-icon">✓</div>
                 <div class="card-header-info">
@@ -268,16 +283,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function focusSearch() {
-    document.getElementById('searchInput').focus();
-}
-
-function prefillSearch(val) {
-    const input = document.getElementById('searchInput');
-    input.value = val;
-    input.focus();
-}
-
+// Ensure loading animation shows on every search
 document.getElementById('searchInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') performSearch();
 });
