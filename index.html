@@ -14,6 +14,7 @@
     <div class="ambient ambient-1"></div>
     <div class="ambient ambient-2"></div>
 
+    <!-- Top navigation bar -->
     <nav class="topbar">
         <div class="topbar-brand">
             <div class="topbar-logo">🔐</div>
@@ -26,46 +27,58 @@
                 <span class="status-divider">·</span>
                 <span class="status-live">Live</span>
             </div>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode">
                 <span class="theme-icon theme-icon-dark">🌙</span>
                 <span class="theme-icon theme-icon-light">☀️</span>
             </button>
         </div>
     </nav>
 
-    <div class="main-split">
-        <!-- LEFT SIDEBAR: search and intro -->
-        <div class="search-sidebar">
-            <div class="compact-hero">
-                <div class="hero-eyebrow">Field Visit Verification</div>
-                <h1>SBC <span>ACCOUNT CHECKER</span></h1>
-                <p>Verify eligibility & find matching accounts by Name or CH code.</p>
-            </div>
+    <!-- Main content - will be dynamically changed by JS -->
+    <main id="mainContent" class="main">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-eyebrow">Field Visit Verification System</div>
+            <h1>SBC ACCOUNT CHECKER</h1>
+            <p class="hero-sub">Search the database to verify whether an account is eligible for field visit.</p>
+        </div>
+
+        <!-- Search panel -->
+        <div class="search-panel">
             <div class="search-field">
                 <span class="search-field-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                     </svg>
                 </span>
-                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off">
-                <button id="searchBtn" onclick="performSearch()"><span>🔍</span> Search</button>
+                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false">
+                <button id="searchBtn" onclick="performSearch()">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search</span>
+                </button>
             </div>
-            <div class="footer-tip" style="margin-top: 8px;">Press <kbd>Enter</kbd> to search · multiple matches appear side-by-side on right</div>
         </div>
 
-        <!-- RIGHT PANEL: results area -->
-        <div class="results-panel" id="resultsPanel">
+        <!-- Results area -->
+        <div class="results-area">
             <div id="loading" class="loading">
-                <div class="loader-ring"></div>
-                <div class="loading-text">Searching database...</div>
+                <div class="loading-inner">
+                    <div class="loader-ring"></div>
+                    <p class="loading-text">Querying database</p>
+                </div>
             </div>
             <div id="result"></div>
         </div>
-    </div>
+    </main>
 
+    <!-- Footer -->
     <footer class="footer">
-        <div class="footer-tip">Field Visit Verification Portal</div>
-        <span class="footer-copy">SBC CH Code Checker · Live Data</span>
+        <div class="footer-tip">Press <kbd>Enter</kbd> to search quickly</div>
+        <span class="footer-copy">Field Visit Verification Portal</span>
     </footer>
 
     <script src="script.js"></script>
