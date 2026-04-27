@@ -216,7 +216,7 @@ body::before {
 
 .split-right .results-area {
     width: 100%;
-    max-width: 700px;
+    max-width: 900px;
     margin: 0;
 }
 
@@ -229,42 +229,51 @@ body::before {
 
 /* Make result card larger and wider */
 .split-right .card-header {
-    padding: 28px 32px;
+    padding: 32px 40px;
 }
 
 .split-right .card-header-icon {
-    width: 56px;
-    height: 56px;
-    font-size: 26px;
+    width: 64px;
+    height: 64px;
+    font-size: 30px;
 }
 
 .split-right .card-header-title {
-    font-size: 20px;
+    font-size: 24px;
+}
+
+.split-right .card-header-sub {
+    font-size: 13px;
+}
+
+.split-right .card-badge {
+    padding: 8px 18px;
+    font-size: 13px;
 }
 
 .split-right .card-details {
-    padding: 24px 32px 32px;
-    gap: 12px;
+    padding: 28px 40px 40px;
+    gap: 16px;
 }
 
 .split-right .detail-item {
-    padding: 18px 20px;
-    gap: 18px;
+    padding: 22px 24px;
+    gap: 20px;
 }
 
 .split-right .detail-item-icon {
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
 }
 
 .split-right .detail-item-label {
-    font-size: 11px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .split-right .detail-item-value {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .results-area .loading.active {
