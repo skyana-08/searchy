@@ -1,4 +1,6 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbyPl4TqynEGZcqB3wNI8FwTMMk_BWzLz4fn2MTNO0JX9npoQPJ1JWL5IhCMlzGPigxB/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbytm4r3RZ438KAKK87bQLrePD1epJocvet9ZLI2WpWfJ54VGYWCrEqiOXpK-eOTPsz7/exec';
+
+let isSplitMode = false;
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -62,8 +64,7 @@ async function performSearch() {
             if (totalResults >= 2 && hasDuplicates) {
                 renderSplitScreen(allResults);
             } else {
-                // Reset to normal UI (no reload needed)
-                removeSplitMode();
+                exitSplitMode();
                 displayResult(data.data);
                 if (totalResults > 1) {
                     const note = document.createElement('div');
@@ -75,7 +76,7 @@ async function performSearch() {
             }
         } else {
             showMessage('error', 'Account Not Found', 'No accounts matched your search. This account is negative for field visit.', '📭');
-            removeSplitMode();
+            exitSplitMode();
         }
 
     } catch (error) {
@@ -84,21 +85,22 @@ async function performSearch() {
         searchBtn.disabled = false;
         searchInput.disabled = false;
         showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
-        removeSplitMode();
+        exitSplitMode();
         console.error('Search error:', error);
     }
 }
 
 function renderSplitScreen(accounts) {
-    const mainElement = document.querySelector('.main');
-    const heroHTML = document.querySelector('.hero').outerHTML;
-    const searchPanelHTML = document.querySelector('.search-panel').outerHTML;
+    const mainElement = document.getElementById('mainContainer');
+    const appRoot = document.getElementById('appRoot');
+    
+    // Store the current search input value
+    const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
     let resultsHTML = '<div class="results-area">';
     accounts.forEach((account, index) => {
-        const delay = index * 0.1;
         resultsHTML += `
-            <div class="result-card success" style="animation: fadeSlide 0.35s ease ${delay}s both;">
+            <div class="result-card success">
                 <div class="card-header">
                     <div class="card-header-icon">✓</div>
                     <div class="card-header-info">
@@ -149,7 +151,12 @@ function renderSplitScreen(accounts) {
     });
     resultsHTML += '</div>';
     
-    mainElement.innerHTML = `
+    // Get the hero and search panel HTML
+    const heroHTML = document.querySelector('.hero')?.outerHTML || '';
+    const searchPanelHTML = document.querySelector('.search-panel')?.outerHTML || '';
+    
+    // Replace the content with split layout
+    appRoot.innerHTML = `
         <div class="split-container">
             <div class="split-left">
                 ${heroHTML}
@@ -160,11 +167,14 @@ function renderSplitScreen(accounts) {
             </div>
         </div>
     `;
-    mainElement.classList.add('split-mode');
     
-    // Re-attach event listeners for new search input
+    mainElement.classList.add('split-mode');
+    isSplitMode = true;
+    
+    // Re-attach event listeners and restore search input value
     const newSearchInput = document.getElementById('searchInput');
     if (newSearchInput) {
+        newSearchInput.value = currentSearchValue;
         newSearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') performSearch();
         });
@@ -177,19 +187,74 @@ function renderSplitScreen(accounts) {
     }
 }
 
-function removeSplitMode() {
-    const mainElement = document.querySelector('.main');
-    if (mainElement.classList.contains('split-mode')) {
-        // Don't reload, just remove split mode and restore original structure
-        mainElement.classList.remove('split-mode');
-        // The original structure is still there, we just need to make sure we're not in split mode
+function exitSplitMode() {
+    if (!isSplitMode) return;
+    
+    const mainElement = document.getElementById('mainContainer');
+    const appRoot = document.getElementById('appRoot');
+    const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    
+    // Restore original layout
+    appRoot.innerHTML = `
+        <div class="hero">
+            <div class="hero-eyebrow">Field Visit Verification System</div>
+            <h1>SBC ACCOUNT CHECKER</h1>
+            <p class="hero-sub">Search the database to verify whether an account is eligible for field visit.</p>
+        </div>
+
+        <div class="search-panel">
+            <div class="search-field">
+                <span class="search-field-icon">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </span>
+                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
+                <button id="searchBtn" onclick="performSearch()">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="results-area">
+            <div id="loading" class="loading">
+                <div class="loading-inner">
+                    <div class="loader-ring"></div>
+                    <p class="loading-text">Querying database</p>
+                </div>
+            </div>
+            <div id="result"></div>
+        </div>
+    `;
+    
+    mainElement.classList.remove('split-mode');
+    isSplitMode = false;
+    
+    // Re-attach event listeners
+    const newSearchInput = document.getElementById('searchInput');
+    if (newSearchInput) {
+        newSearchInput.value = currentSearchValue;
+        newSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+        newSearchInput.focus();
+    }
+    
+    const newSearchBtn = document.getElementById('searchBtn');
+    if (newSearchBtn) {
+        newSearchBtn.onclick = performSearch;
     }
 }
 
 function displayResult(data) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = `
-        <div class="result-card success" style="animation: fadeSlide 0.35s ease;">
+        <div class="result-card success">
             <div class="card-header">
                 <div class="card-header-icon">✓</div>
                 <div class="card-header-info">
@@ -242,7 +307,6 @@ function displayResult(data) {
 function showMessage(type, title, message, icon) {
     const resultDiv = document.getElementById('result');
     const isError = type === 'error';
-
     resultDiv.innerHTML = `
         <div class="result-card ${isError ? 'error' : 'success'}">
             <div class="card-header">
@@ -266,10 +330,14 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-document.getElementById('searchInput').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') performSearch();
+// Global event listener that always works
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && e.target.id === 'searchInput') {
+        performSearch();
+    }
 });
 
-window.addEventListener('load', function () {
-    document.getElementById('searchInput').focus();
+window.addEventListener('load', function() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.focus();
 });
