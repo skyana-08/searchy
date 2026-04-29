@@ -156,44 +156,46 @@ body::before {
 [data-theme="light"] .theme-icon-light { display: block; }
 
 .main {
-    position: relative; z-index: 1; flex: 1; display: flex;
-    align-items: center;
-    padding: 64px 24px 80px;
+    position: relative; z-index: 1; flex: 1;
+    width: 100%;
 }
 
-/* SPLIT SCREEN MODE - FIXED FOR DESKTOP */
-.split-mode { 
-    max-width: 1600px; 
-    width: 100%; 
-    margin: 0 auto; 
-    padding: 40px 24px 60px !important; 
+/* SPLIT SCREEN MODE - PC: Left on LEFT edge, Right on RIGHT edge */
+.split-mode {
+    width: 100%;
+    height: calc(100vh - 56px);
+    position: relative;
 }
 
-.split-container { 
-    display: flex; 
-    gap: 40px; 
-    width: 100%; 
-    align-items: stretch;
+.split-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
-.split-left { 
-    flex: 0.8; 
-    min-width: 0;
+.split-left {
+    width: 50%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
-.split-right { 
-    flex: 1.2; 
-    min-width: 0; 
-    max-height: 70vh; 
-    overflow-y: auto; 
-    padding-right: 10px;
+.split-right {
+    width: 50%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 
 .split-left .hero {
@@ -209,22 +211,48 @@ body::before {
     margin-bottom: 0;
 }
 
-.split-right .results-area { 
-    max-width: 100%; 
+.split-right .results-area {
     width: 100%;
+    max-width: 750px;
 }
 
-.split-right .result-card { 
-    box-shadow: none; 
+.split-right .result-card {
+    box-shadow: none;
     border: 1px solid var(--border-detail);
     width: 100%;
+    margin-bottom: 16px;
+}
+
+.results-area .loading.active {
+    display: block;
+}
+
+/* Custom scrollbar for right side */
+.split-right::-webkit-scrollbar {
+    width: 8px;
+}
+
+.split-right::-webkit-scrollbar-track {
+    background: var(--bg-detail-item);
+    border-radius: 10px;
+}
+
+.split-right::-webkit-scrollbar-thumb {
+    background: var(--sb-blue-400);
+    border-radius: 10px;
+}
+
+.split-right::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-blue-600);
 }
 
 /* Default main content styling (non-split mode) */
 .main:not(.split-mode) {
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    padding: 64px 24px 80px;
 }
 
 .hero { text-align: center; margin-bottom: 48px; max-width: 580px; }
@@ -425,25 +453,6 @@ body::before {
     scrollbar-color: var(--sb-blue-500) var(--bg-input);
 }
 
-.split-right::-webkit-scrollbar {
-    width: 8px;
-}
-
-.split-right::-webkit-scrollbar-track {
-    background: var(--bg-detail-item);
-    border-radius: 10px;
-    margin: 4px;
-}
-
-.split-right::-webkit-scrollbar-thumb {
-    background: var(--sb-blue-400);
-    border-radius: 10px;
-}
-
-.split-right::-webkit-scrollbar-thumb:hover {
-    background: var(--sb-blue-600);
-}
-
 html {
     scroll-behavior: smooth;
 }
@@ -510,6 +519,10 @@ html {
     scrollbar-color: var(--sb-blue-600) var(--bg-input);
 }
 
+/* ============================================ */
+/* MOBILE RESPONSIVE - STACKS VERTICALLY */
+/* ============================================ */
+
 @media (max-width: 860px) {
     .topbar { padding: 0 18px; }
     .main { padding: 40px 16px 60px; }
@@ -519,9 +532,36 @@ html {
     .search-field-icon { display: none; }
     #searchInput { text-align: center; padding: 12px; }
     #searchBtn { justify-content: center; }
-    .split-container { flex-direction: column; }
-    .split-right { max-height: none; }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
+    
+    /* Mobile: stack vertically */
+    .split-mode {
+        height: auto;
+        position: relative;
+    }
+    
+    .split-container {
+        flex-direction: column;
+        position: relative;
+    }
+    
+    .split-left {
+        width: 100%;
+        position: relative;
+        min-height: auto;
+        padding: 30px 20px;
+    }
+    
+    .split-right {
+        width: 100%;
+        position: relative;
+        max-height: none;
+        padding: 20px;
+    }
+    
+    .split-right .results-area {
+        max-width: 100%;
+    }
     
     .mini-card {
         padding: 12px 16px;
