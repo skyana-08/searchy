@@ -204,20 +204,24 @@ body::before {
     overflow-y: auto;
 }
 
+/* Left side content - centered horizontally */
 .split-left .hero {
-    width: 100%;
-    max-width: 450px;
+    width: 450px;
+    max-width: 80%;
+    margin: 0 auto;
 }
 
 .split-left .search-panel {
-    width: 100%;
-    max-width: 450px;
-    margin-top: 32px;
+    width: 450px;
+    max-width: 80%;
+    margin: 32px auto 0;
 }
 
+/* Right side content - centered horizontally */
 .split-right .results-area {
-    width: 100%;
-    max-width: 750px;
+    width: 750px;
+    max-width: 90%;
+    margin: 0 auto;
 }
 
 .split-right .result-card {
@@ -438,16 +442,19 @@ body::before {
     }
     
     .split-left .hero {
-        max-width: 90%;
+        width: 90%;
+        max-width: 350px;
     }
     
     .split-left .search-panel {
-        max-width: 90%;
+        width: 90%;
+        max-width: 350px;
         margin-top: 20px;
     }
     
     .split-right .results-area {
-        max-width: 95%;
+        width: 95%;
+        max-width: 550px;
     }
     
     .hero h1 {
