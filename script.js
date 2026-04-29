@@ -1,7 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbytm4r3RZ438KAKK87bQLrePD1epJocvet9ZLI2WpWfJ54VGYWCrEqiOXpK-eOTPsz7/exec';
 
 let isSplitMode = false;
-let currentAccounts = []; // Store accounts for multiple results view
+let currentAccounts = [];
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -87,11 +87,9 @@ async function performSearch() {
             const totalResults = data.totalResults || 1;
             
             if (totalResults >= 2) {
-                // Multiple accounts found - show mini cards
                 currentAccounts = allResults;
                 renderMiniCards(allResults);
             } else {
-                // Single account found - show full details
                 currentAccounts = [];
                 exitSplitMode();
                 displayResult(data.data);
@@ -129,7 +127,7 @@ function renderMiniCards(accounts) {
                     <span class="results-icon">📋</span>
                     <div>
                         <h3>${accounts.length} Accounts Found</h3>
-                        <p>Click on any account to view full details</p>
+                        <p>Tap any account to view full details</p>
                     </div>
                 </div>
                 <button class="clear-results-btn" onclick="clearResults()">✕ Clear</button>
@@ -138,8 +136,7 @@ function renderMiniCards(accounts) {
     `;
     
     accounts.forEach((account, index) => {
-        // Create a shortened name for display
-        const shortName = account.name.length > 30 ? account.name.substring(0, 27) + '...' : account.name;
+        const shortName = account.name.length > 35 ? account.name.substring(0, 32) + '...' : account.name;
         
         resultsHTML += `
             <div class="mini-card" data-index="${index}" onclick="showAccountDetails(${index})">
@@ -147,6 +144,7 @@ function renderMiniCards(accounts) {
                 <div class="mini-card-info">
                     <div class="mini-card-name">${escapeHtml(shortName)}</div>
                     <div class="mini-card-code">${escapeHtml(account.code)}</div>
+                    <div class="mini-card-status">✓ Eligible</div>
                 </div>
                 <div class="mini-card-arrow">→</div>
             </div>
@@ -182,7 +180,6 @@ function renderMiniCards(accounts) {
     }, 0);
 }
 
-// Global function to show account details when clicking a mini card
 window.showAccountDetails = function(index) {
     const account = currentAccounts[index];
     if (!account) return;
@@ -192,7 +189,6 @@ window.showAccountDetails = function(index) {
     const multipleResultsHeader = document.querySelector('.multiple-results-header');
     
     if (fullDetailContainer && miniCardsContainer) {
-        // Hide mini cards and show full detail
         miniCardsContainer.style.display = 'none';
         if (multipleResultsHeader) multipleResultsHeader.style.display = 'none';
         
@@ -206,13 +202,11 @@ window.showAccountDetails = function(index) {
             </div>
         `;
         
-        // Scroll to top of results
         const splitRight = document.querySelector('.split-right');
         if (splitRight) splitRight.scrollTop = 0;
     }
 };
 
-// Global function to go back to mini cards
 window.backToResults = function() {
     const fullDetailContainer = document.getElementById('full-detail-container');
     const miniCardsContainer = document.querySelector('.mini-cards-container');
@@ -226,7 +220,6 @@ window.backToResults = function() {
     }
 };
 
-// Global function to clear results
 window.clearResults = function() {
     currentAccounts = [];
     exitSplitMode();
@@ -284,12 +277,6 @@ function generateFullDetailCard(data) {
             </div>
         </div>
     `;
-}
-
-function renderSplitScreen(accounts) {
-    // This function is kept for backward compatibility but now uses mini cards
-    currentAccounts = accounts;
-    renderMiniCards(accounts);
 }
 
 function exitSplitMode() {
