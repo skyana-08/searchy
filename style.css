@@ -161,7 +161,7 @@ body::before {
     padding: 64px 24px 80px;
 }
 
-/* SPLIT SCREEN MODE - Original positions preserved */
+/* SPLIT SCREEN MODE - Side by side on ALL devices */
 .split-mode {
     max-width: 1600px;
     width: 100%;
@@ -405,7 +405,7 @@ body::before {
 .mini-card:nth-child(6) { animation-delay: 0.3s; }
 
 /* ============================================ */
-/* MOBILE RESPONSIVE - ONLY SCALES SIZES, POSITIONS UNCHANGED */
+/* MOBILE RESPONSIVE - KEEPS SPLIT SIDE BY SIDE */
 /* ============================================ */
 
 @media (max-width: 860px) {
@@ -417,9 +417,22 @@ body::before {
     .search-field-icon { display: none; }
     #searchInput { text-align: center; padding: 12px; }
     #searchBtn { justify-content: center; }
-    .split-container { flex-direction: column; }
-    .split-right { max-height: none; }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
+    
+    /* Keep split side by side - just reduce gap and padding */
+    .split-container {
+        gap: 20px;
+    }
+    
+    .split-left {
+        flex: 1;
+    }
+    
+    .split-right {
+        flex: 1;
+        max-height: 60vh;
+        padding-right: 5px;
+    }
     
     /* Scale down mini cards for mobile */
     .mini-card {
@@ -478,6 +491,55 @@ body::before {
     
     .detail-item-value {
         font-size: 13px;
+    }
+    
+    .split-left .hero {
+        max-width: 350px;
+    }
+    
+    .split-left .search-panel {
+        max-width: 350px;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .split-container {
+        gap: 12px;
+    }
+    
+    .split-left .hero {
+        max-width: 280px;
+    }
+    
+    .split-left .search-panel {
+        max-width: 280px;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-sub {
+        font-size: 11px;
+    }
+    
+    .mini-card {
+        padding: 10px 12px;
+    }
+    
+    .mini-card-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .mini-card-name {
+        font-size: 11px;
+    }
+    
+    .mini-card-code {
+        font-size: 9px;
     }
 }
 
