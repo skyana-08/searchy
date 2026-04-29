@@ -1,6 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbytm4r3RZ438KAKK87bQLrePD1epJocvet9ZLI2WpWfJ54VGYWCrEqiOXpK-eOTPsz7/exec';
 
 let isSplitMode = false;
+let currentAccounts = []; // Store accounts for multiple results view
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -85,28 +86,20 @@ async function performSearch() {
             const allResults = data.allResults || [data.data];
             const totalResults = data.totalResults || 1;
             
-            const names = allResults.map(acc => acc.name?.trim().toUpperCase());
-            const codes = allResults.map(acc => acc.code?.trim().toUpperCase());
-            const hasDuplicateName = new Set(names).size !== names.length;
-            const hasDuplicateCode = new Set(codes).size !== codes.length;
-            const hasDuplicates = hasDuplicateName || hasDuplicateCode;
-            
-            if (totalResults >= 2 && hasDuplicates) {
-                renderSplitScreen(allResults);
+            if (totalResults >= 2) {
+                // Multiple accounts found - show mini cards
+                currentAccounts = allResults;
+                renderMiniCards(allResults);
             } else {
+                // Single account found - show full details
+                currentAccounts = [];
                 exitSplitMode();
                 displayResult(data.data);
-                if (totalResults > 1 && document.getElementById('result')) {
-                    const note = document.createElement('div');
-                    note.className = 'result-card';
-                    note.style.marginTop = '16px';
-                    note.innerHTML = `<div class="card-message"><p class="card-message-text"><strong>${totalResults} accounts found</strong><br>No duplicate names or CH codes. Showing first result.</p></div>`;
-                    document.getElementById('result').appendChild(note);
-                }
             }
         } else {
             showMessage('error', 'Account Not Found', 'No accounts matched your search. This account is negative for field visit.', '📭');
             exitSplitMode();
+            currentAccounts = [];
         }
 
     } catch (error) {
@@ -118,74 +111,53 @@ async function performSearch() {
         if (searchInput) searchInput.disabled = false;
         showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
         exitSplitMode();
+        currentAccounts = [];
         console.error('Search error:', error);
     }
 }
 
-function renderSplitScreen(accounts) {
+function renderMiniCards(accounts) {
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
     
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
-    let resultsHTML = '<div class="results-area" id="splitResultsArea">';
-    resultsHTML += '<div id="loading" class="loading" style="display: none;">';
-    resultsHTML += '<div class="loading-inner"><div class="loader-ring"></div><p class="loading-text">Querying database</p></div>';
-    resultsHTML += '</div>';
-    resultsHTML += '<div id="result"></div>';
+    let resultsHTML = `
+        <div class="results-area">
+            <div class="multiple-results-header">
+                <div class="multiple-results-title">
+                    <span class="results-icon">📋</span>
+                    <div>
+                        <h3>${accounts.length} Accounts Found</h3>
+                        <p>Click on any account to view full details</p>
+                    </div>
+                </div>
+                <button class="clear-results-btn" onclick="clearResults()">✕ Clear</button>
+            </div>
+            <div class="mini-cards-container">
+    `;
     
     accounts.forEach((account, index) => {
+        // Create a shortened name for display
+        const shortName = account.name.length > 30 ? account.name.substring(0, 27) + '...' : account.name;
+        
         resultsHTML += `
-            <div class="result-card success">
-                <div class="card-header">
-                    <div class="card-header-icon">✓</div>
-                    <div class="card-header-info">
-                        <div class="card-header-title">Account Verified</div>
-                        <div class="card-header-sub">CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT</div>
-                    </div>
-                    <span class="card-badge">✓ GO</span>
+            <div class="mini-card" data-index="${index}" onclick="showAccountDetails(${index})">
+                <div class="mini-card-icon">👤</div>
+                <div class="mini-card-info">
+                    <div class="mini-card-name">${escapeHtml(shortName)}</div>
+                    <div class="mini-card-code">${escapeHtml(account.code)}</div>
                 </div>
-                <div class="card-details">
-                    <div class="detail-item">
-                        <div class="detail-item-icon">👤</div>
-                        <div class="detail-item-content">
-                            <div class="detail-item-label">Account Name</div>
-                            <div class="detail-item-value name-val">${escapeHtml(account.name)}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-item-icon">🏷️</div>
-                        <div class="detail-item-content">
-                            <div class="detail-item-label">CH Code</div>
-                            <div class="detail-item-value code-val">${escapeHtml(account.code)}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-item-icon">📊</div>
-                        <div class="detail-item-content">
-                            <div class="detail-item-label">OB — Outstanding Balance</div>
-                            <div class="detail-item-value amount-val">₱${escapeHtml(account.ob)}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-item-icon">📅</div>
-                        <div class="detail-item-content">
-                            <div class="detail-item-label">PD — Past Due</div>
-                            <div class="detail-item-value amount-val">₱${escapeHtml(account.pd)}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-item-icon">💳</div>
-                        <div class="detail-item-content">
-                            <div class="detail-item-label">MAD — Minimum Amount Due</div>
-                            <div class="detail-item-value amount-val">₱${escapeHtml(account.mad)}</div>
-                        </div>
-                    </div>
-                </div>
+                <div class="mini-card-arrow">→</div>
             </div>
         `;
     });
-    resultsHTML += '</div>';
+    
+    resultsHTML += `
+            </div>
+            <div id="full-detail-container" style="display: none;"></div>
+        </div>
+    `;
     
     const heroHTML = document.querySelector('.hero')?.outerHTML || '';
     const searchPanelHTML = document.querySelector('.search-panel')?.outerHTML || '';
@@ -210,94 +182,60 @@ function renderSplitScreen(accounts) {
     }, 0);
 }
 
-function exitSplitMode() {
-    if (!isSplitMode) return;
+// Global function to show account details when clicking a mini card
+window.showAccountDetails = function(index) {
+    const account = currentAccounts[index];
+    if (!account) return;
     
-    const mainElement = document.getElementById('mainContainer');
-    const appRoot = document.getElementById('appRoot');
-    const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    const fullDetailContainer = document.getElementById('full-detail-container');
+    const miniCardsContainer = document.querySelector('.mini-cards-container');
+    const multipleResultsHeader = document.querySelector('.multiple-results-header');
     
-    appRoot.innerHTML = `
-        <div class="hero">
-            <div class="hero-eyebrow">Field Visit Verification System</div>
-            <h1>SBC ACCOUNT CHECKER</h1>
-            <p class="hero-sub">Search the database to verify whether an account is eligible for field visit.</p>
-        </div>
-
-        <div class="search-panel">
-            <div class="search-field">
-                <span class="search-field-icon">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                    </svg>
-                </span>
-                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
-                <button id="searchBtn">
-                    <span class="btn-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                        </svg>
-                    </span>
-                    <span>Search</span>
+    if (fullDetailContainer && miniCardsContainer) {
+        // Hide mini cards and show full detail
+        miniCardsContainer.style.display = 'none';
+        if (multipleResultsHeader) multipleResultsHeader.style.display = 'none';
+        
+        fullDetailContainer.style.display = 'block';
+        fullDetailContainer.innerHTML = `
+            <div class="full-detail-view">
+                <button class="back-to-results-btn" onclick="backToResults()">
+                    ← Back to results
                 </button>
+                ${generateFullDetailCard(account)}
             </div>
-        </div>
-
-        <div class="results-area">
-            <div id="loading" class="loading">
-                <div class="loading-inner">
-                    <div class="loader-ring"></div>
-                    <p class="loading-text">Querying database</p>
-                </div>
-            </div>
-            <div id="result"></div>
-        </div>
-    `;
-    
-    mainElement.classList.remove('split-mode');
-    isSplitMode = false;
-    
-    setTimeout(() => {
-        attachEventListeners(currentSearchValue);
-    }, 0);
-}
-
-function attachEventListeners(savedSearchValue) {
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    
-    if (searchInput) {
-        searchInput.value = savedSearchValue || '';
-        const newSearchInput = searchInput.cloneNode(true);
-        if (searchInput.parentNode) {
-            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-        }
-        newSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                performSearch();
-            }
-        });
-        setTimeout(() => newSearchInput.focus(), 0);
+        `;
+        
+        // Scroll to top of results
+        const splitRight = document.querySelector('.split-right');
+        if (splitRight) splitRight.scrollTop = 0;
     }
-    
-    if (searchBtn) {
-        const newSearchBtn = searchBtn.cloneNode(true);
-        if (searchBtn.parentNode) {
-            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
-        }
-        newSearchBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            performSearch();
-        });
-    }
-}
+};
 
-function displayResult(data) {
+// Global function to go back to mini cards
+window.backToResults = function() {
+    const fullDetailContainer = document.getElementById('full-detail-container');
+    const miniCardsContainer = document.querySelector('.mini-cards-container');
+    const multipleResultsHeader = document.querySelector('.multiple-results-header');
+    
+    if (fullDetailContainer && miniCardsContainer) {
+        fullDetailContainer.style.display = 'none';
+        miniCardsContainer.style.display = 'flex';
+        if (multipleResultsHeader) multipleResultsHeader.style.display = 'flex';
+        fullDetailContainer.innerHTML = '';
+    }
+};
+
+// Global function to clear results
+window.clearResults = function() {
+    currentAccounts = [];
+    exitSplitMode();
     const resultDiv = document.getElementById('result');
-    if (!resultDiv) return;
-    
-    resultDiv.innerHTML = `
+    if (resultDiv) resultDiv.innerHTML = '';
+};
+
+function generateFullDetailCard(data) {
+    return `
         <div class="result-card success">
             <div class="card-header">
                 <div class="card-header-icon">✓</div>
@@ -346,6 +284,103 @@ function displayResult(data) {
             </div>
         </div>
     `;
+}
+
+function renderSplitScreen(accounts) {
+    // This function is kept for backward compatibility but now uses mini cards
+    currentAccounts = accounts;
+    renderMiniCards(accounts);
+}
+
+function exitSplitMode() {
+    if (!isSplitMode) return;
+    
+    const mainElement = document.getElementById('mainContainer');
+    const appRoot = document.getElementById('appRoot');
+    const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    
+    appRoot.innerHTML = `
+        <div class="hero">
+            <div class="hero-eyebrow">Field Visit Verification System</div>
+            <h1>SBC ACCOUNT CHECKER</h1>
+            <p class="hero-sub">Search the database to verify whether an account is eligible for field visit.</p>
+        </div>
+
+        <div class="search-panel">
+            <div class="search-field">
+                <span class="search-field-icon">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </span>
+                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
+                <button id="searchBtn">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="results-area">
+            <div id="loading" class="loading">
+                <div class="loading-inner">
+                    <div class="loader-ring"></div>
+                    <p class="loading-text">Querying database</p>
+                </div>
+            </div>
+            <div id="result"></div>
+        </div>
+    `;
+    
+    mainElement.classList.remove('split-mode');
+    isSplitMode = false;
+    currentAccounts = [];
+    
+    setTimeout(() => {
+        attachEventListeners(currentSearchValue);
+    }, 0);
+}
+
+function attachEventListeners(savedSearchValue) {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    if (searchInput) {
+        searchInput.value = savedSearchValue || '';
+        const newSearchInput = searchInput.cloneNode(true);
+        if (searchInput.parentNode) {
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        }
+        newSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+        setTimeout(() => newSearchInput.focus(), 0);
+    }
+    
+    if (searchBtn) {
+        const newSearchBtn = searchBtn.cloneNode(true);
+        if (searchBtn.parentNode) {
+            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+        }
+        newSearchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+    }
+}
+
+function displayResult(data) {
+    const resultDiv = document.getElementById('result');
+    if (!resultDiv) return;
+    
+    resultDiv.innerHTML = generateFullDetailCard(data);
 }
 
 function showMessage(type, title, message, icon) {
