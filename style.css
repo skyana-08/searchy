@@ -156,68 +156,74 @@ body::before {
 [data-theme="light"] .theme-icon-light { display: block; }
 
 .main {
-    position: relative; z-index: 1; flex: 1; display: flex;
-    align-items: center;
-    padding: 64px 24px 80px;
+    position: relative; z-index: 1; flex: 1;
+    width: 100%;
 }
 
-/* SPLIT SCREEN MODE - Side by side on ALL devices */
+/* SPLIT SCREEN MODE - Search on LEFT edge, Results on RIGHT edge */
 .split-mode {
-    max-width: 1600px;
     width: 100%;
-    margin: 0 auto;
-    padding: 40px 24px 60px !important;
+    height: calc(100vh - 56px);
+    position: relative;
 }
 
 .split-container {
     display: flex;
-    gap: 40px;
+    justify-content: space-between;
     width: 100%;
-    align-items: stretch;
+    height: 100%;
 }
 
 .split-left {
-    flex: 0.8;
-    min-width: 0;
+    width: 45%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 .split-right {
-    flex: 1.2;
-    min-width: 0;
-    max-height: 70vh;
-    overflow-y: auto;
-    padding-right: 10px;
+    width: 45%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-right: 40px;
 }
 
 .split-left .hero {
     width: 100%;
-    max-width: 500px;
+    max-width: 450px;
     margin: 0;
 }
 
 .split-left .search-panel {
     width: 100%;
-    max-width: 500px;
+    max-width: 450px;
     margin-top: 32px;
     margin-bottom: 0;
 }
 
 .split-right .results-area {
-    max-width: 100%;
     width: 100%;
+    max-width: 750px;
+    margin: 0;
 }
 
 .split-right .result-card {
     box-shadow: none;
     border: 1px solid var(--border-detail);
     width: 100%;
+    margin: 0;
 }
 
 .results-area .loading.active {
@@ -226,9 +232,11 @@ body::before {
 
 /* Default main content styling (non-split mode) */
 .main:not(.split-mode) {
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    padding: 64px 24px 80px;
 }
 
 .hero { text-align: center; margin-bottom: 48px; max-width: 580px; }
@@ -405,36 +413,38 @@ body::before {
 .mini-card:nth-child(6) { animation-delay: 0.3s; }
 
 /* ============================================ */
-/* MOBILE RESPONSIVE - KEEPS SPLIT SIDE BY SIDE */
+/* MOBILE RESPONSIVE - KEEP LEFT AND RIGHT POSITIONS */
 /* ============================================ */
 
 @media (max-width: 860px) {
     .topbar { padding: 0 18px; }
-    .main { padding: 40px 16px 60px; }
-    .hero { margin-bottom: 32px; }
-    .hero h1 { font-size: 2rem; }
-    .search-field { flex-direction: column; align-items: stretch; padding: 6px; }
-    .search-field-icon { display: none; }
-    #searchInput { text-align: center; padding: 12px; }
-    #searchBtn { justify-content: center; }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
     
-    /* Keep split side by side - just reduce gap and padding */
-    .split-container {
-        gap: 20px;
-    }
-    
+    /* Keep the split layout, just scale down */
     .split-left {
-        flex: 1;
+        width: 50%;
+        padding-left: 16px;
     }
     
     .split-right {
-        flex: 1;
-        max-height: 60vh;
-        padding-right: 5px;
+        width: 50%;
+        padding-right: 16px;
     }
     
-    /* Scale down mini cards for mobile */
+    .split-left .hero {
+        max-width: 100%;
+    }
+    
+    .split-left .search-panel {
+        max-width: 100%;
+        margin-top: 20px;
+    }
+    
+    .split-right .results-area {
+        max-width: 100%;
+    }
+    
+    /* Scale down mini cards */
     .mini-card {
         padding: 12px 16px;
         gap: 12px;
@@ -491,55 +501,6 @@ body::before {
     
     .detail-item-value {
         font-size: 13px;
-    }
-    
-    .split-left .hero {
-        max-width: 350px;
-    }
-    
-    .split-left .search-panel {
-        max-width: 350px;
-        margin-top: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .split-container {
-        gap: 12px;
-    }
-    
-    .split-left .hero {
-        max-width: 280px;
-    }
-    
-    .split-left .search-panel {
-        max-width: 280px;
-    }
-    
-    .hero h1 {
-        font-size: 1.5rem;
-    }
-    
-    .hero-sub {
-        font-size: 11px;
-    }
-    
-    .mini-card {
-        padding: 10px 12px;
-    }
-    
-    .mini-card-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
-    }
-    
-    .mini-card-name {
-        font-size: 11px;
-    }
-    
-    .mini-card-code {
-        font-size: 9px;
     }
 }
 
