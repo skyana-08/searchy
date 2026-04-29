@@ -172,12 +172,11 @@ body::before {
     overflow: hidden;
 }
 
-/* SPLIT SCREEN MODE */
+/* SPLIT SCREEN MODE - Search on LEFT side center, Results on RIGHT side center */
 .split-mode {
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: hidden;
 }
 
 .split-container {
@@ -194,7 +193,6 @@ body::before {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    padding: 20px;
 }
 
 .split-right {
@@ -202,28 +200,10 @@ body::before {
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px 20px 20px 0;
-}
-
-/* Custom scrollbar for right side only */
-.split-right::-webkit-scrollbar {
-    width: 8px;
-}
-
-.split-right::-webkit-scrollbar-track {
-    background: var(--bg-detail-item);
-    border-radius: 10px;
-}
-
-.split-right::-webkit-scrollbar-thumb {
-    background: var(--sb-blue-400);
-    border-radius: 10px;
-}
-
-.split-right::-webkit-scrollbar-thumb:hover {
-    background: var(--sb-blue-600);
 }
 
 .split-left .hero {
@@ -241,7 +221,7 @@ body::before {
 
 .split-right .results-area {
     width: 100%;
-    max-width: 100%;
+    max-width: 750px;
     margin: 0;
 }
 
@@ -249,11 +229,30 @@ body::before {
     box-shadow: none;
     border: 1px solid var(--border-detail);
     width: 100%;
-    margin: 0 0 16px 0;
+    margin: 0;
 }
 
 .results-area .loading.active {
     display: block;
+}
+
+/* Custom scrollbar for right side */
+.split-right::-webkit-scrollbar {
+    width: 8px;
+}
+
+.split-right::-webkit-scrollbar-track {
+    background: var(--bg-detail-item);
+    border-radius: 10px;
+}
+
+.split-right::-webkit-scrollbar-thumb {
+    background: var(--sb-blue-400);
+    border-radius: 10px;
+}
+
+.split-right::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-blue-600);
 }
 
 /* Default main content styling (non-split mode) */
@@ -475,7 +474,7 @@ body::before {
     }
     
     .split-right {
-        padding: 16px 16px 16px 0;
+        padding: 16px;
     }
     
     .split-left .hero {
@@ -485,6 +484,10 @@ body::before {
     .split-left .search-panel {
         max-width: 100%;
         margin-top: 20px;
+    }
+    
+    .split-right .results-area {
+        max-width: 100%;
     }
     
     .hero h1 {
@@ -592,7 +595,7 @@ body::before {
     }
     
     .split-right {
-        padding: 12px 12px 12px 0;
+        padding: 12px;
     }
     
     .hero h1 {
