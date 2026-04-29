@@ -122,16 +122,6 @@ function renderMiniCards(accounts) {
     
     let resultsHTML = `
         <div class="results-area">
-            <div class="multiple-results-header">
-                <div class="multiple-results-title">
-                    <span class="results-icon">📋</span>
-                    <div>
-                        <h3>${accounts.length} Accounts Found</h3>
-                        <p>Tap any account to view full details</p>
-                    </div>
-                </div>
-                <button class="clear-results-btn" onclick="clearResults()">✕ Clear</button>
-            </div>
             <div class="mini-cards-container">
     `;
     
@@ -144,7 +134,6 @@ function renderMiniCards(accounts) {
                 <div class="mini-card-info">
                     <div class="mini-card-name">${escapeHtml(shortName)}</div>
                     <div class="mini-card-code">${escapeHtml(account.code)}</div>
-                    <div class="mini-card-status">✓ Eligible</div>
                 </div>
                 <div class="mini-card-arrow">→</div>
             </div>
@@ -186,17 +175,15 @@ window.showAccountDetails = function(index) {
     
     const fullDetailContainer = document.getElementById('full-detail-container');
     const miniCardsContainer = document.querySelector('.mini-cards-container');
-    const multipleResultsHeader = document.querySelector('.multiple-results-header');
     
     if (fullDetailContainer && miniCardsContainer) {
         miniCardsContainer.style.display = 'none';
-        if (multipleResultsHeader) multipleResultsHeader.style.display = 'none';
         
         fullDetailContainer.style.display = 'block';
         fullDetailContainer.innerHTML = `
             <div class="full-detail-view">
                 <button class="back-to-results-btn" onclick="backToResults()">
-                    ← Back to results
+                    ← Back
                 </button>
                 ${generateFullDetailCard(account)}
             </div>
@@ -210,21 +197,12 @@ window.showAccountDetails = function(index) {
 window.backToResults = function() {
     const fullDetailContainer = document.getElementById('full-detail-container');
     const miniCardsContainer = document.querySelector('.mini-cards-container');
-    const multipleResultsHeader = document.querySelector('.multiple-results-header');
     
     if (fullDetailContainer && miniCardsContainer) {
         fullDetailContainer.style.display = 'none';
         miniCardsContainer.style.display = 'flex';
-        if (multipleResultsHeader) multipleResultsHeader.style.display = 'flex';
         fullDetailContainer.innerHTML = '';
     }
-};
-
-window.clearResults = function() {
-    currentAccounts = [];
-    exitSplitMode();
-    const resultDiv = document.getElementById('result');
-    if (resultDiv) resultDiv.innerHTML = '';
 };
 
 function generateFullDetailCard(data) {
