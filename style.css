@@ -202,26 +202,24 @@ body::before {
     justify-content: center;
     align-items: center;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* Left side content - centered horizontally */
 .split-left .hero {
-    width: 450px;
-    max-width: 80%;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
 }
 
 .split-left .search-panel {
-    width: 450px;
-    max-width: 80%;
-    margin: 32px auto 0;
+    width: 100%;
+    max-width: 450px;
+    margin-top: 32px;
 }
 
-/* Right side content - centered horizontally */
 .split-right .results-area {
-    width: 750px;
-    max-width: 90%;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 750px;
 }
 
 .split-right .result-card {
@@ -442,19 +440,16 @@ body::before {
     }
     
     .split-left .hero {
-        width: 90%;
-        max-width: 350px;
+        max-width: 90%;
     }
     
     .split-left .search-panel {
-        width: 90%;
-        max-width: 350px;
+        max-width: 90%;
         margin-top: 20px;
     }
     
     .split-right .results-area {
-        width: 95%;
-        max-width: 550px;
+        max-width: 95%;
     }
     
     .hero h1 {
