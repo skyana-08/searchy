@@ -3,12 +3,6 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzGZm2zuKUATbQE3ZqMTZus
 let isSplitMode = false;
 let currentAccounts = [];
 
-// Cache DOM elements for better performance
-let cachedSearchInput = null;
-let cachedResultDiv = null;
-let cachedLoadingDiv = null;
-let cachedSearchBtn = null;
-
 function toggleTheme() {
     const html = document.documentElement;
     const current = html.getAttribute('data-theme');
@@ -27,22 +21,26 @@ function toggleTheme() {
 window.performSearch = performSearch;
 
 async function performSearch() {
-    if (!cachedSearchInput) cachedSearchInput = document.getElementById('searchInput');
-    if (!cachedResultDiv) cachedResultDiv = document.getElementById('result');
-    if (!cachedLoadingDiv) cachedLoadingDiv = document.getElementById('loading');
-    if (!cachedSearchBtn) cachedSearchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) {
+        console.error('Search input not found');
+        return;
+    }
     
-    const searchTerm = cachedSearchInput?.value.trim();
-    
+    const searchTerm = searchInput.value.trim();
+    const resultDiv = document.getElementById('result');
+    let loadingDiv = document.getElementById('loading');
+    const searchBtn = document.getElementById('searchBtn');
+
     if (!searchTerm) {
         showMessage('error', 'No query entered', 'Please enter a name, CH code, or amount to search the database.', '🔍');
-        if (cachedSearchInput) cachedSearchInput.focus();
+        if (searchInput) searchInput.focus();
         return;
     }
 
-    if (cachedResultDiv) cachedResultDiv.innerHTML = '';
+    if (resultDiv) resultDiv.innerHTML = '';
     
-    if (!cachedLoadingDiv) {
+    if (!loadingDiv) {
         const resultsArea = document.querySelector('.results-area');
         if (resultsArea) {
             const loadingHTML = `
@@ -54,49 +52,35 @@ async function performSearch() {
                 </div>
             `;
             resultsArea.insertAdjacentHTML('afterbegin', loadingHTML);
-            cachedLoadingDiv = document.getElementById('loading');
+            loadingDiv = document.getElementById('loading');
         }
     }
     
-    if (cachedLoadingDiv) {
-        cachedLoadingDiv.style.display = 'block';
-        cachedLoadingDiv.classList.add('active');
+    if (loadingDiv) {
+        loadingDiv.style.display = 'block';
+        loadingDiv.classList.add('active');
     }
     
-    if (cachedSearchBtn) cachedSearchBtn.disabled = true;
-    if (cachedSearchInput) cachedSearchInput.disabled = true;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    if (searchBtn) searchBtn.disabled = true;
+    if (searchInput) searchInput.disabled = true;
 
     try {
-        const url = `${API_URL}?q=${encodeURIComponent(searchTerm)}`;
-        console.log('Fetching:', url);
-        
-        const response = await fetch(url, {
-            signal: controller.signal,
-            mode: 'cors',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        clearTimeout(timeoutId);
+        const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-        console.log('Data received:', data);
 
-        if (cachedLoadingDiv) {
-            cachedLoadingDiv.style.display = 'none';
-            cachedLoadingDiv.classList.remove('active');
+        if (loadingDiv) {
+            loadingDiv.style.display = 'none';
+            loadingDiv.classList.remove('active');
         }
         
-        if (cachedSearchBtn) cachedSearchBtn.disabled = false;
-        if (cachedSearchInput) cachedSearchInput.disabled = false;
-        if (cachedSearchInput) cachedSearchInput.focus();
+        if (searchBtn) searchBtn.disabled = false;
+        if (searchInput) searchInput.disabled = false;
+        if (searchInput) searchInput.focus();
 
         if (data.found && data.data) {
             const allResults = data.allResults || [data.data];
@@ -117,28 +101,16 @@ async function performSearch() {
         }
 
     } catch (error) {
-        console.error('Fetch error:', error);
-        
-        if (cachedLoadingDiv) {
-            cachedLoadingDiv.style.display = 'none';
-            cachedLoadingDiv.classList.remove('active');
+        if (loadingDiv) {
+            loadingDiv.style.display = 'none';
+            loadingDiv.classList.remove('active');
         }
-        if (cachedSearchBtn) cachedSearchBtn.disabled = false;
-        if (cachedSearchInput) cachedSearchInput.disabled = false;
-        
-        let errorMessage = 'Unable to connect to the database. ';
-        
-        if (error.name === 'AbortError') {
-            errorMessage = 'Request timeout. Please try again.';
-        } else if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'Cannot reach the server. Please check:\n1. Apps Script is deployed\n2. Deployment has "Execute as: Me" and "Access: Anyone"\n3. You have internet connection';
-        } else {
-            errorMessage += error.message;
-        }
-        
-        showMessage('error', 'Connection Error', errorMessage, '🔌');
+        if (searchBtn) searchBtn.disabled = false;
+        if (searchInput) searchInput.disabled = false;
+        showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
         exitSplitMode();
         currentAccounts = [];
+        console.error('Search error:', error);
     }
 }
 
@@ -146,12 +118,11 @@ function renderMiniCards(accounts) {
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
     
-    const currentSearchValue = cachedSearchInput?.value || '';
+    const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
     let resultsHTML = `
         <div class="results-area">
-            <div class="virtual-scroll-container" id="virtualScrollContainer">
-                <div class="mini-cards-container" id="miniCardsContainer">
+            <div class="mini-cards-container">
     `;
     
     accounts.forEach((account, index) => {
@@ -161,7 +132,7 @@ function renderMiniCards(accounts) {
         const statusText = status === 'pullout' ? '✗ PULLOUT' : '✓ GO';
         
         resultsHTML += `
-            <div class="mini-card scroll-item" data-index="${index}" data-scroll-index="${index}" onclick="showAccountDetails(${index})">
+            <div class="mini-card" data-index="${index}" onclick="showAccountDetails(${index})">
                 <div class="mini-card-icon">👤</div>
                 <div class="mini-card-info">
                     <div class="mini-card-name">${escapeHtml(shortName)}</div>
@@ -174,7 +145,6 @@ function renderMiniCards(accounts) {
     });
     
     resultsHTML += `
-                </div>
             </div>
             <div id="full-detail-container" style="display: none;"></div>
         </div>
@@ -189,7 +159,7 @@ function renderMiniCards(accounts) {
                 ${heroHTML}
                 ${searchPanelHTML}
             </div>
-            <div class="split-right" id="splitRightContainer">
+            <div class="split-right">
                 ${resultsHTML}
             </div>
         </div>
@@ -200,44 +170,7 @@ function renderMiniCards(accounts) {
     
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
-        initScrollFadeEffect();
-    }, 50);
-}
-
-function initScrollFadeEffect() {
-    const container = document.getElementById('splitRightContainer');
-    if (!container) return;
-    
-    container.addEventListener('scroll', handleScrollFade, { passive: true });
-    setTimeout(() => handleScrollFade(), 10);
-}
-
-function handleScrollFade() {
-    const container = document.getElementById('splitRightContainer');
-    const items = document.querySelectorAll('.scroll-item');
-    if (!container || !items.length) return;
-    
-    const containerRect = container.getBoundingClientRect();
-    const containerCenter = containerRect.top + containerRect.height / 2;
-    const fadeRange = containerRect.height / 2;
-    
-    requestAnimationFrame(() => {
-        items.forEach(item => {
-            const itemRect = item.getBoundingClientRect();
-            const itemCenter = itemRect.top + itemRect.height / 2;
-            const distanceFromCenter = Math.abs(itemCenter - containerCenter);
-            
-            let opacity = 1 - (distanceFromCenter / fadeRange);
-            opacity = Math.max(0.2, Math.min(1, opacity));
-            
-            let scale = 1 - (distanceFromCenter / fadeRange) * 0.1;
-            scale = Math.max(0.9, Math.min(1, scale));
-            
-            item.style.opacity = opacity;
-            item.style.transform = `scale(${scale})`;
-            item.style.transition = 'opacity 0.1s ease-out, transform 0.1s ease-out';
-        });
-    });
+    }, 0);
 }
 
 window.showAccountDetails = function(index) {
@@ -245,7 +178,7 @@ window.showAccountDetails = function(index) {
     if (!account) return;
     
     const fullDetailContainer = document.getElementById('full-detail-container');
-    const miniCardsContainer = document.getElementById('miniCardsContainer');
+    const miniCardsContainer = document.querySelector('.mini-cards-container');
     
     if (fullDetailContainer && miniCardsContainer) {
         miniCardsContainer.style.display = 'none';
@@ -267,13 +200,12 @@ window.showAccountDetails = function(index) {
 
 window.backToResults = function() {
     const fullDetailContainer = document.getElementById('full-detail-container');
-    const miniCardsContainer = document.getElementById('miniCardsContainer');
+    const miniCardsContainer = document.querySelector('.mini-cards-container');
     
     if (fullDetailContainer && miniCardsContainer) {
         fullDetailContainer.style.display = 'none';
         miniCardsContainer.style.display = 'flex';
         fullDetailContainer.innerHTML = '';
-        setTimeout(() => handleScrollFade(), 10);
     }
 };
 
@@ -348,7 +280,7 @@ function exitSplitMode() {
     
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
-    const currentSearchValue = cachedSearchInput?.value || '';
+    const currentSearchValue = document.getElementById('searchInput')?.value || '';
     
     appRoot.innerHTML = `
         <div class="hero">
@@ -391,25 +323,20 @@ function exitSplitMode() {
     isSplitMode = false;
     currentAccounts = [];
     
-    cachedSearchInput = null;
-    cachedResultDiv = null;
-    cachedLoadingDiv = null;
-    cachedSearchBtn = null;
-    
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
     }, 0);
 }
 
 function attachEventListeners(savedSearchValue) {
-    cachedSearchInput = document.getElementById('searchInput');
-    cachedSearchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
     
-    if (cachedSearchInput) {
-        cachedSearchInput.value = savedSearchValue || '';
-        const newSearchInput = cachedSearchInput.cloneNode(true);
-        if (cachedSearchInput.parentNode) {
-            cachedSearchInput.parentNode.replaceChild(newSearchInput, cachedSearchInput);
+    if (searchInput) {
+        searchInput.value = savedSearchValue || '';
+        const newSearchInput = searchInput.cloneNode(true);
+        if (searchInput.parentNode) {
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
         }
         newSearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -418,35 +345,33 @@ function attachEventListeners(savedSearchValue) {
             }
         });
         setTimeout(() => newSearchInput.focus(), 0);
-        cachedSearchInput = newSearchInput;
     }
     
-    if (cachedSearchBtn) {
-        const newSearchBtn = cachedSearchBtn.cloneNode(true);
-        if (cachedSearchBtn.parentNode) {
-            cachedSearchBtn.parentNode.replaceChild(newSearchBtn, cachedSearchBtn);
+    if (searchBtn) {
+        const newSearchBtn = searchBtn.cloneNode(true);
+        if (searchBtn.parentNode) {
+            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
         }
         newSearchBtn.addEventListener('click', function(e) {
             e.preventDefault();
             performSearch();
         });
-        cachedSearchBtn = newSearchBtn;
     }
 }
 
 function displayResult(data) {
-    cachedResultDiv = document.getElementById('result');
-    if (!cachedResultDiv) return;
+    const resultDiv = document.getElementById('result');
+    if (!resultDiv) return;
     
-    cachedResultDiv.innerHTML = generateFullDetailCard(data);
+    resultDiv.innerHTML = generateFullDetailCard(data);
 }
 
 function showMessage(type, title, message, icon) {
-    cachedResultDiv = document.getElementById('result');
-    if (!cachedResultDiv) return;
+    const resultDiv = document.getElementById('result');
+    if (!resultDiv) return;
     
     const isError = type === 'error';
-    cachedResultDiv.innerHTML = `
+    resultDiv.innerHTML = `
         <div class="result-card ${isError ? 'error' : 'success'}">
             <div class="card-header">
                 <div class="card-header-icon">${icon}</div>
