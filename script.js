@@ -2,6 +2,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzGZm2zuKUATbQE3ZqMTZus
 
 let isSplitMode = false;
 let currentAccounts = [];
+let scrollTimeout = null;
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -170,7 +171,48 @@ function renderMiniCards(accounts) {
     
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
+        setupScrollFadeEffect();
     }, 0);
+}
+
+function setupScrollFadeEffect() {
+    const scrollContainer = document.querySelector('.split-right');
+    if (!scrollContainer) return;
+    
+    const updateFadeEffect = () => {
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const containerCenter = containerRect.top + containerRect.height / 2;
+        const visibleRange = containerRect.height / 2.5;
+        
+        const cards = scrollContainer.querySelectorAll('.result-card, .mini-card');
+        
+        cards.forEach(card => {
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = cardRect.top + cardRect.height / 2;
+            const distanceFromCenter = Math.abs(cardCenter - containerCenter);
+            
+            if (distanceFromCenter > visibleRange) {
+                const opacity = Math.max(0.15, 1 - (distanceFromCenter - visibleRange) / visibleRange);
+                card.style.opacity = opacity;
+                if (opacity < 0.3) {
+                    card.classList.add('faded-out');
+                } else {
+                    card.classList.remove('faded-out');
+                }
+            } else {
+                card.style.opacity = 1;
+                card.classList.remove('faded-out');
+            }
+        });
+    };
+    
+    scrollContainer.addEventListener('scroll', () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        updateFadeEffect();
+        scrollTimeout = setTimeout(() => updateFadeEffect(), 100);
+    });
+    
+    updateFadeEffect();
 }
 
 window.showAccountDetails = function(index) {
@@ -206,6 +248,8 @@ window.backToResults = function() {
         fullDetailContainer.style.display = 'none';
         miniCardsContainer.style.display = 'flex';
         fullDetailContainer.innerHTML = '';
+        
+        setTimeout(() => setupScrollFadeEffect(), 0);
     }
 };
 
@@ -364,6 +408,13 @@ function displayResult(data) {
     if (!resultDiv) return;
     
     resultDiv.innerHTML = generateFullDetailCard(data);
+    
+    setTimeout(() => {
+        const splitRight = document.querySelector('.split-right');
+        if (splitRight) {
+            setupScrollFadeEffect();
+        }
+    }, 0);
 }
 
 function showMessage(type, title, message, icon) {
