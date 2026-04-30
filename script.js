@@ -1,7 +1,15 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbwnOuaWyWQI6beGIF-riS-2bH01jdWodiQjbGK2_HMCfXLRDHFifhr9b7jlpRTZrAw0/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyWNoT0YN2sttDomaR9zSP5wf5tMH7VqV4qvaKQACpR4d-bnUmPS3XwZh2Fk5ZUwDl0/exec';
 
 let isSplitMode = false;
 let currentAccounts = [];
+let scrollContainer = null;
+let scrollFrames = [];
+
+// Cache DOM elements for better performance
+let cachedSearchInput = null;
+let cachedResultDiv = null;
+let cachedLoadingDiv = null;
+let cachedSearchBtn = null;
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -20,27 +28,36 @@ function toggleTheme() {
 
 window.performSearch = performSearch;
 
-async function performSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) {
-        console.error('Search input not found');
-        return;
-    }
-    
-    const searchTerm = searchInput.value.trim();
-    const resultDiv = document.getElementById('result');
-    let loadingDiv = document.getElementById('loading');
-    const searchBtn = document.getElementById('searchBtn');
+// Debounce function to prevent excessive API calls
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
+async function performSearch() {
+    if (!cachedSearchInput) cachedSearchInput = document.getElementById('searchInput');
+    if (!cachedResultDiv) cachedResultDiv = document.getElementById('result');
+    if (!cachedLoadingDiv) cachedLoadingDiv = document.getElementById('loading');
+    if (!cachedSearchBtn) cachedSearchBtn = document.getElementById('searchBtn');
+    
+    const searchTerm = cachedSearchInput?.value.trim();
+    
     if (!searchTerm) {
         showMessage('error', 'No query entered', 'Please enter a name, CH code, or amount to search the database.', '🔍');
-        if (searchInput) searchInput.focus();
+        if (cachedSearchInput) cachedSearchInput.focus();
         return;
     }
 
-    if (resultDiv) resultDiv.innerHTML = '';
+    if (cachedResultDiv) cachedResultDiv.innerHTML = '';
     
-    if (!loadingDiv) {
+    if (!cachedLoadingDiv) {
         const resultsArea = document.querySelector('.results-area');
         if (resultsArea) {
             const loadingHTML = `
@@ -52,20 +69,27 @@ async function performSearch() {
                 </div>
             `;
             resultsArea.insertAdjacentHTML('afterbegin', loadingHTML);
-            loadingDiv = document.getElementById('loading');
+            cachedLoadingDiv = document.getElementById('loading');
         }
     }
     
-    if (loadingDiv) {
-        loadingDiv.style.display = 'block';
-        loadingDiv.classList.add('active');
+    if (cachedLoadingDiv) {
+        cachedLoadingDiv.style.display = 'block';
+        cachedLoadingDiv.classList.add('active');
     }
     
-    if (searchBtn) searchBtn.disabled = true;
-    if (searchInput) searchInput.disabled = true;
+    if (cachedSearchBtn) cachedSearchBtn.disabled = true;
+    if (cachedSearchInput) cachedSearchInput.disabled = true;
+
+    // Use AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     try {
-        const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -73,14 +97,14 @@ async function performSearch() {
 
         const data = await response.json();
 
-        if (loadingDiv) {
-            loadingDiv.style.display = 'none';
-            loadingDiv.classList.remove('active');
+        if (cachedLoadingDiv) {
+            cachedLoadingDiv.style.display = 'none';
+            cachedLoadingDiv.classList.remove('active');
         }
         
-        if (searchBtn) searchBtn.disabled = false;
-        if (searchInput) searchInput.disabled = false;
-        if (searchInput) searchInput.focus();
+        if (cachedSearchBtn) cachedSearchBtn.disabled = false;
+        if (cachedSearchInput) cachedSearchInput.disabled = false;
+        if (cachedSearchInput) cachedSearchInput.focus();
 
         if (data.found && data.data) {
             const allResults = data.allResults || [data.data];
@@ -101,13 +125,19 @@ async function performSearch() {
         }
 
     } catch (error) {
-        if (loadingDiv) {
-            loadingDiv.style.display = 'none';
-            loadingDiv.classList.remove('active');
+        if (cachedLoadingDiv) {
+            cachedLoadingDiv.style.display = 'none';
+            cachedLoadingDiv.classList.remove('active');
         }
-        if (searchBtn) searchBtn.disabled = false;
-        if (searchInput) searchInput.disabled = false;
-        showMessage('error', 'Connection Error', 'Unable to connect to the database. Please check your connection and try again.', '🔌');
+        if (cachedSearchBtn) cachedSearchBtn.disabled = false;
+        if (cachedSearchInput) cachedSearchInput.disabled = false;
+        
+        let errorMessage = 'Unable to connect to the database. Please check your connection and try again.';
+        if (error.name === 'AbortError') {
+            errorMessage = 'Request timeout. Please try again.';
+        }
+        
+        showMessage('error', 'Connection Error', errorMessage, '🔌');
         exitSplitMode();
         currentAccounts = [];
         console.error('Search error:', error);
@@ -118,11 +148,12 @@ function renderMiniCards(accounts) {
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
     
-    const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    const currentSearchValue = cachedSearchInput?.value || '';
     
     let resultsHTML = `
         <div class="results-area">
-            <div class="mini-cards-container">
+            <div class="virtual-scroll-container" id="virtualScrollContainer">
+                <div class="mini-cards-container" id="miniCardsContainer">
     `;
     
     accounts.forEach((account, index) => {
@@ -132,7 +163,7 @@ function renderMiniCards(accounts) {
         const statusText = status === 'pullout' ? '✗ PULLOUT' : '✓ GO';
         
         resultsHTML += `
-            <div class="mini-card" data-index="${index}" onclick="showAccountDetails(${index})">
+            <div class="mini-card scroll-item" data-index="${index}" data-scroll-index="${index}" onclick="showAccountDetails(${index})">
                 <div class="mini-card-icon">👤</div>
                 <div class="mini-card-info">
                     <div class="mini-card-name">${escapeHtml(shortName)}</div>
@@ -145,6 +176,7 @@ function renderMiniCards(accounts) {
     });
     
     resultsHTML += `
+                </div>
             </div>
             <div id="full-detail-container" style="display: none;"></div>
         </div>
@@ -159,7 +191,7 @@ function renderMiniCards(accounts) {
                 ${heroHTML}
                 ${searchPanelHTML}
             </div>
-            <div class="split-right">
+            <div class="split-right" id="splitRightContainer">
                 ${resultsHTML}
             </div>
         </div>
@@ -168,9 +200,53 @@ function renderMiniCards(accounts) {
     mainElement.classList.add('split-mode');
     isSplitMode = true;
     
+    // Initialize scroll fade effect
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
-    }, 0);
+        initScrollFadeEffect();
+    }, 50);
+}
+
+function initScrollFadeEffect() {
+    const container = document.getElementById('splitRightContainer');
+    if (!container) return;
+    
+    // Add scroll event listener with passive option for better performance
+    container.addEventListener('scroll', handleScrollFade, { passive: true });
+    
+    // Initial call to set fade states
+    setTimeout(() => handleScrollFade(), 10);
+}
+
+function handleScrollFade() {
+    const container = document.getElementById('splitRightContainer');
+    const items = document.querySelectorAll('.scroll-item');
+    if (!container || !items.length) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.top + containerRect.height / 2;
+    const fadeRange = containerRect.height / 2;
+    
+    // Use requestAnimationFrame for smooth performance
+    requestAnimationFrame(() => {
+        items.forEach(item => {
+            const itemRect = item.getBoundingClientRect();
+            const itemCenter = itemRect.top + itemRect.height / 2;
+            const distanceFromCenter = Math.abs(itemCenter - containerCenter);
+            
+            // Calculate opacity based on distance from center
+            let opacity = 1 - (distanceFromCenter / fadeRange);
+            opacity = Math.max(0.2, Math.min(1, opacity));
+            
+            // Calculate scale based on distance
+            let scale = 1 - (distanceFromCenter / fadeRange) * 0.1;
+            scale = Math.max(0.9, Math.min(1, scale));
+            
+            item.style.opacity = opacity;
+            item.style.transform = `translateX(${opacity === 1 ? '0px' : '0px'}) scale(${scale})`;
+            item.style.transition = 'opacity 0.1s ease-out, transform 0.1s ease-out';
+        });
+    });
 }
 
 window.showAccountDetails = function(index) {
@@ -178,7 +254,8 @@ window.showAccountDetails = function(index) {
     if (!account) return;
     
     const fullDetailContainer = document.getElementById('full-detail-container');
-    const miniCardsContainer = document.querySelector('.mini-cards-container');
+    const miniCardsContainer = document.getElementById('miniCardsContainer');
+    const virtualScrollContainer = document.getElementById('virtualScrollContainer');
     
     if (fullDetailContainer && miniCardsContainer) {
         miniCardsContainer.style.display = 'none';
@@ -200,12 +277,15 @@ window.showAccountDetails = function(index) {
 
 window.backToResults = function() {
     const fullDetailContainer = document.getElementById('full-detail-container');
-    const miniCardsContainer = document.querySelector('.mini-cards-container');
+    const miniCardsContainer = document.getElementById('miniCardsContainer');
     
     if (fullDetailContainer && miniCardsContainer) {
         fullDetailContainer.style.display = 'none';
         miniCardsContainer.style.display = 'flex';
         fullDetailContainer.innerHTML = '';
+        
+        // Reapply fade effect after returning
+        setTimeout(() => handleScrollFade(), 10);
     }
 };
 
@@ -280,7 +360,7 @@ function exitSplitMode() {
     
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
-    const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    const currentSearchValue = cachedSearchInput?.value || '';
     
     appRoot.innerHTML = `
         <div class="hero">
@@ -323,20 +403,26 @@ function exitSplitMode() {
     isSplitMode = false;
     currentAccounts = [];
     
+    // Clear cached references
+    cachedSearchInput = null;
+    cachedResultDiv = null;
+    cachedLoadingDiv = null;
+    cachedSearchBtn = null;
+    
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
     }, 0);
 }
 
 function attachEventListeners(savedSearchValue) {
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
+    cachedSearchInput = document.getElementById('searchInput');
+    cachedSearchBtn = document.getElementById('searchBtn');
     
-    if (searchInput) {
-        searchInput.value = savedSearchValue || '';
-        const newSearchInput = searchInput.cloneNode(true);
-        if (searchInput.parentNode) {
-            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+    if (cachedSearchInput) {
+        cachedSearchInput.value = savedSearchValue || '';
+        const newSearchInput = cachedSearchInput.cloneNode(true);
+        if (cachedSearchInput.parentNode) {
+            cachedSearchInput.parentNode.replaceChild(newSearchInput, cachedSearchInput);
         }
         newSearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -345,33 +431,35 @@ function attachEventListeners(savedSearchValue) {
             }
         });
         setTimeout(() => newSearchInput.focus(), 0);
+        cachedSearchInput = newSearchInput;
     }
     
-    if (searchBtn) {
-        const newSearchBtn = searchBtn.cloneNode(true);
-        if (searchBtn.parentNode) {
-            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+    if (cachedSearchBtn) {
+        const newSearchBtn = cachedSearchBtn.cloneNode(true);
+        if (cachedSearchBtn.parentNode) {
+            cachedSearchBtn.parentNode.replaceChild(newSearchBtn, cachedSearchBtn);
         }
         newSearchBtn.addEventListener('click', function(e) {
             e.preventDefault();
             performSearch();
         });
+        cachedSearchBtn = newSearchBtn;
     }
 }
 
 function displayResult(data) {
-    const resultDiv = document.getElementById('result');
-    if (!resultDiv) return;
+    cachedResultDiv = document.getElementById('result');
+    if (!cachedResultDiv) return;
     
-    resultDiv.innerHTML = generateFullDetailCard(data);
+    cachedResultDiv.innerHTML = generateFullDetailCard(data);
 }
 
 function showMessage(type, title, message, icon) {
-    const resultDiv = document.getElementById('result');
-    if (!resultDiv) return;
+    cachedResultDiv = document.getElementById('result');
+    if (!cachedResultDiv) return;
     
     const isError = type === 'error';
-    resultDiv.innerHTML = `
+    cachedResultDiv.innerHTML = `
         <div class="result-card ${isError ? 'error' : 'success'}">
             <div class="card-header">
                 <div class="card-header-icon">${icon}</div>
