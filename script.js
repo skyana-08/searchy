@@ -256,7 +256,7 @@ function generateFullDetailCard(data) {
                     <div class="detail-item-icon">ⓘ</div>
                     <div class="detail-item-content">
                         <div class="detail-item-label">Status</div>
-                        <div class="detail-item-value amount-val">₱${escapeHtml(data.status)}</div>
+                        <div class="detail-item-value name-val">${escapeHtml(data.status)}</div>
                     </div>
                 </div>
             </div>
