@@ -127,6 +127,9 @@ function renderMiniCards(accounts) {
     
     accounts.forEach((account, index) => {
         const shortName = account.name.length > 35 ? account.name.substring(0, 32) + '...' : account.name;
+        const status = account.status ? account.status.toLowerCase() : 'active';
+        const statusClass = status === 'pullout' ? 'status-pullout' : 'status-active';
+        const statusText = status === 'pullout' ? '✗ PULLOUT' : '✓ GO';
         
         resultsHTML += `
             <div class="mini-card" data-index="${index}" onclick="showAccountDetails(${index})">
@@ -134,6 +137,7 @@ function renderMiniCards(accounts) {
                 <div class="mini-card-info">
                     <div class="mini-card-name">${escapeHtml(shortName)}</div>
                     <div class="mini-card-code">${escapeHtml(account.code)}</div>
+                    <div class="mini-card-status ${statusClass}">${statusText}</div>
                 </div>
                 <div class="mini-card-arrow">→</div>
             </div>
@@ -206,15 +210,22 @@ window.backToResults = function() {
 };
 
 function generateFullDetailCard(data) {
+    const status = data.status ? data.status.toLowerCase() : 'active';
+    const isPullout = status === 'pullout';
+    const badgeText = isPullout ? '✗ PULLOUT' : '✓ GO';
+    const badgeClass = isPullout ? 'card-badge-pullout' : 'card-badge';
+    const headerClass = isPullout ? 'card-header-pullout' : 'card-header';
+    const resultCardClass = isPullout ? 'result-card pullout' : 'result-card success';
+    
     return `
-        <div class="result-card success">
-            <div class="card-header">
-                <div class="card-header-icon">✓</div>
+        <div class="${resultCardClass}">
+            <div class="${headerClass}">
+                <div class="card-header-icon">${isPullout ? '✗' : '✓'}</div>
                 <div class="card-header-info">
-                    <div class="card-header-title">Account Verified</div>
-                    <div class="card-header-sub">CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT</div>
+                    <div class="card-header-title">Account ${isPullout ? 'Not Eligible' : 'Verified'}</div>
+                    <div class="card-header-sub">${isPullout ? 'PULLOUT - NOT ELIGIBLE FOR FIELD VISIT' : 'CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT'}</div>
                 </div>
-                <span class="card-badge">✓ GO</span>
+                <span class="${badgeClass}">${badgeText}</span>
             </div>
             <div class="card-details">
                 <div class="detail-item">
@@ -253,10 +264,10 @@ function generateFullDetailCard(data) {
                     </div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-item-icon">ⓘ</div>
+                    <div class="detail-item-icon">📌</div>
                     <div class="detail-item-content">
                         <div class="detail-item-label">Status</div>
-                        <div class="detail-item-value name-val">${escapeHtml(data.status)}</div>
+                        <div class="detail-item-value status-val ${isPullout ? 'status-pullout' : 'status-active'}">${escapeHtml(data.status || 'Active')}</div>
                     </div>
                 </div>
             </div>
