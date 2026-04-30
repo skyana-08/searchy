@@ -112,12 +112,12 @@
 body {
     font-family: var(--font-body);
     background-color: var(--bg-base);
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     color: var(--text-primary);
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow-x: hidden;
 }
 
 body::before {
@@ -138,7 +138,6 @@ body::before {
     position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between;
     padding: 0 48px; height: 56px; border-bottom: 1px solid var(--border-nav);
     background: var(--bg-nav); backdrop-filter: blur(12px);
-    flex-shrink: 0;
 }
 .topbar-brand { display: flex; align-items: center; gap: 10px; }
 .topbar-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 1px solid rgba(0,166,81,0.35); }
@@ -157,26 +156,24 @@ body::before {
 [data-theme="light"] .theme-icon-light { display: block; }
 
 .main {
-    position: relative;
-    z-index: 1;
-    flex: 1;
+    position: relative; z-index: 1; flex: 1;
     width: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* SPLIT SCREEN MODE - PC: Left on LEFT edge, Right on RIGHT edge */
 .split-mode {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 56px);
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .split-container {
     display: flex;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .split-left {
@@ -189,8 +186,7 @@ body::before {
     position: absolute;
     left: 0;
     top: 0;
-    overflow: hidden;
-    padding: 20px;
+    overflow-x: hidden;
 }
 
 .split-right {
@@ -205,7 +201,6 @@ body::before {
     position: absolute;
     right: 0;
     top: 0;
-    padding: 20px 20px 20px 0;
 }
 
 .split-left .hero {
@@ -223,7 +218,7 @@ body::before {
 
 .split-right .results-area {
     width: 100%;
-    max-width: 100%;
+    max-width: 750px;
     overflow-x: hidden;
 }
 
@@ -235,22 +230,7 @@ body::before {
     overflow-x: hidden;
 }
 
-/* Fix for long text overflow */
-.detail-item-value.code-val {
-    word-break: break-all;
-    overflow-wrap: break-word;
-}
-
-.detail-item-value.name-val {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-.results-area .loading.active {
-    display: block;
-}
-
-/* Custom scrollbar for right side */
+/* Custom scrollbar for right side - VERTICAL ONLY */
 .split-right::-webkit-scrollbar {
     width: 8px;
 }
@@ -276,7 +256,6 @@ body::before {
     align-items: center;
     justify-content: flex-start;
     padding: 64px 24px 80px;
-    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -296,32 +275,66 @@ body::before {
 #searchBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,71,187,0.4); }
 #searchBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.results-area { width: 100%; max-width: 680px; }
+.results-area { width: 100%; max-width: 680px; overflow-x: hidden; }
 .loading { display: none; padding: 56px 0; text-align: center; }
 .loader-ring { width: 44px; height: 44px; margin: 0 auto; position: relative; }
 .loader-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--sb-green-400); border-right-color: var(--sb-blue-500); animation: spin 0.9s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.result-card { width: 100%; border-radius: 16px; overflow: hidden; background: var(--bg-card); box-shadow: 0 20px 60px rgba(0,0,0,0.18); margin-bottom: 16px; }
+.result-card { 
+    width: 100%; 
+    border-radius: 16px; 
+    overflow: hidden; 
+    background: var(--bg-card); 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18); 
+    margin-bottom: 16px;
+    overflow-x: hidden;
+}
 .result-card.success { border: 1px solid var(--border-card-success); }
 .card-header { padding: 24px 28px; display: flex; align-items: center; gap: 16px; background: var(--card-header-success-bg); border-bottom: 1px solid var(--card-header-success-border); flex-wrap: wrap; }
-.card-header-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: linear-gradient(135deg, #00a651, #00843d); border: 1px solid rgba(0,166,81,0.3); color: white; box-shadow: 0 2px 8px rgba(0,166,81,0.3); flex-shrink: 0; }
+.card-header-icon { 
+    width: 48px; 
+    height: 48px; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 22px; 
+    background: linear-gradient(135deg, #00a651, #00843d); 
+    border: 1px solid rgba(0,166,81,0.3); 
+    color: white; 
+    box-shadow: 0 2px 8px rgba(0,166,81,0.3);
+    flex-shrink: 0;
+}
 .card-header-info { flex: 1; min-width: 0; }
 .card-header-title { font-size: 17px; font-weight: 600; color: var(--text-heading); }
-.card-header-sub { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); white-space: normal; word-break: break-word; }
+.card-header-sub { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); word-break: break-word; }
 .card-badge { padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, var(--sb-green-500), var(--sb-green-700)); color: white; flex-shrink: 0; }
 .card-details { padding: 20px 28px 28px; display: flex; flex-direction: column; gap: 8px; }
 .detail-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 10px; background: var(--bg-detail-item); border: 1px solid var(--border-detail); }
-.detail-item-icon { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #4d84e2, #003087); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; box-shadow: 0 2px 6px rgba(77,132,226,0.3); flex-shrink: 0; }
+.detail-item-icon { 
+    width: 36px; 
+    height: 36px; 
+    border-radius: 8px; 
+    background: linear-gradient(135deg, #4d84e2, #003087); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 18px; 
+    color: white; 
+    box-shadow: 0 2px 6px rgba(77,132,226,0.3);
+    flex-shrink: 0;
+}
 .detail-item-content { flex: 1; min-width: 0; }
 .detail-item-label { font-size: 10px; font-family: var(--font-mono); font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-.detail-item-value { font-size: 15px; font-weight: 600; word-break: break-word; overflow-wrap: break-word; }
+.detail-item-value { font-size: 15px; font-weight: 600; word-break: break-word; }
 .detail-item-value.name-val { color: var(--accent-name); }
 .detail-item-value.amount-val { font-family: var(--font-mono); color: var(--accent-amount); }
 .detail-item-value.code-val { font-family: var(--font-mono); color: var(--accent-code); word-break: break-all; }
 .card-message { padding: 32px 28px; text-align: center; }
 
-.footer { padding: 12px 48px; border-top: 1px solid var(--border-nav); display: flex; justify-content: space-between; background: var(--bg-footer); font-size: 12px; flex-shrink: 0; }
+.footer { padding: 18px 48px; border-top: 1px solid var(--border-nav); display: flex; justify-content: space-between; background: var(--bg-footer); font-size: 12px; }
+
 .footer-tip kbd { padding: 2px 6px; background: var(--kbd-bg); border-radius: 4px; }
 
 /* ============================================ */
@@ -332,7 +345,6 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    width: 100%;
 }
 
 .mini-card {
@@ -346,6 +358,7 @@ body::before {
     cursor: pointer;
     transition: all 0.2s ease;
     width: 100%;
+    overflow: hidden;
 }
 
 .mini-card:hover {
@@ -443,7 +456,6 @@ body::before {
     font-weight: 700;
     background: linear-gradient(135deg, #dc2626, #991b1b);
     color: white;
-    flex-shrink: 0;
 }
 
 .card-header-pullout {
@@ -453,7 +465,6 @@ body::before {
     gap: 16px;
     background: rgba(220, 38, 38, 0.08);
     border-bottom: 1px solid rgba(220, 38, 38, 0.2);
-    flex-wrap: wrap;
 }
 
 .card-header-pullout .card-header-icon {
@@ -519,12 +530,12 @@ body::before {
 .mini-card:nth-child(6) { animation-delay: 0.3s; }
 
 /* ============================================ */
-/* CUSTOM SCROLLBAR STYLES */
+/* CUSTOM SCROLLBAR STYLES - VERTICAL ONLY */
 /* ============================================ */
 
 ::-webkit-scrollbar {
     width: 10px;
-    height: 10px;
+    height: 0px;
 }
 
 ::-webkit-scrollbar-track {
@@ -550,6 +561,7 @@ body::before {
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
@@ -569,6 +581,11 @@ html {
     background: linear-gradient(135deg, var(--sb-blue-500), var(--sb-blue-600));
 }
 
+.split-right {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-blue-400) var(--bg-detail-item);
+}
+
 ::-webkit-scrollbar-corner {
     background: var(--bg-base);
 }
@@ -578,7 +595,7 @@ html {
 }
 
 /* ============================================ */
-/* MOBILE RESPONSIVE - STACKS VERTICALLY */
+/* MOBILE RESPONSIVE */
 /* ============================================ */
 
 @media (max-width: 860px) {
@@ -592,17 +609,14 @@ html {
     #searchBtn { justify-content: center; }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
     
-    /* Mobile: stack vertically */
     .split-mode {
         height: auto;
         position: relative;
-        overflow: visible;
     }
     
     .split-container {
         flex-direction: column;
         position: relative;
-        overflow: visible;
     }
     
     .split-left {
@@ -617,7 +631,6 @@ html {
         position: relative;
         max-height: none;
         padding: 20px;
-        overflow-y: visible;
     }
     
     .split-right .results-area {
@@ -683,8 +696,8 @@ html {
     }
 }
 
-/* Prevent any horizontal scrolling on all elements */
-html, body, .main, .split-mode, .split-container, .split-left, .split-right, .results-area, .result-card {
-    overflow-x: hidden;
+/* Ensure NO horizontal scroll on any element */
+html, body, .main, .split-mode, .split-container, .split-left, .split-right, .results-area, .result-card, .mini-card {
     max-width: 100%;
+    overflow-x: hidden;
 }
