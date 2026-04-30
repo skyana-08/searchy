@@ -379,6 +379,58 @@ body::before {
     color: var(--sb-blue-400);
 }
 
+/* Status badge styles for mini cards */
+.mini-card-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+}
+
+.mini-card-status.status-active {
+    background: rgba(0, 166, 81, 0.15);
+    color: var(--sb-green-400);
+}
+
+.mini-card-status.status-pullout {
+    background: rgba(220, 38, 38, 0.15);
+    color: #ef4444;
+}
+
+/* Status badge styles for full detail cards */
+.card-badge-pullout {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    color: white;
+}
+
+.card-header-pullout {
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(220, 38, 38, 0.08);
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.result-card.pullout {
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.status-val.status-active {
+    color: var(--sb-green-400);
+}
+
+.status-val.status-pullout {
+    color: #ef4444;
+}
+
 .back-to-results-btn {
     background: var(--bg-tag);
     border: 1px solid var(--border-tag);
