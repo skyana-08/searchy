@@ -1,8 +1,4 @@
-// ============================================
-// PUT YOUR WEB APP URL HERE - CHANGE THIS ONLY
-// ============================================
 const API_URL = 'https://script.google.com/macros/s/AKfycby4RpnUZ-FK4_Xs3PWXt_J-QdGdDoDiMuhKXFvkeME5a6qaunPBYjm0V6heaizxpo4z/exec';
-// ============================================
 
 let isSplitMode = false;
 let currentAccounts = [];
@@ -16,48 +12,21 @@ function toggleTheme() {
     localStorage.setItem('checkmych-theme', next);
 }
 
+function logout() {
+    localStorage.removeItem('checkmych-session');
+    localStorage.removeItem('checkmych-email');
+    localStorage.removeItem('checkmych-fullname');
+    localStorage.removeItem('checkmych-userid');
+    localStorage.removeItem('checkmych-role');
+    window.location.href = 'login.html';
+}
+
 (function initTheme() {
     const saved = localStorage.getItem('checkmych-theme');
     if (saved === 'light' || saved === 'dark') {
         document.documentElement.setAttribute('data-theme', saved);
     }
 })();
-
-async function validateSession() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionToken = urlParams.get('session');
-    
-    if (!sessionToken) {
-        window.location.href = API_URL;
-        return false;
-    }
-    
-    try {
-        const response = await fetch(`${API_URL}?action=checkSession&sessionToken=${sessionToken}`);
-        const data = await response.json();
-        
-        if (!data.valid) {
-            localStorage.removeItem('sessionToken');
-            window.location.href = API_URL;
-            return false;
-        }
-        return true;
-    } catch (error) {
-        console.error('Session validation error:', error);
-        window.location.href = API_URL;
-        return false;
-    }
-}
-
-async function handleLogout() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionToken = urlParams.get('session');
-    if (sessionToken) {
-        await fetch(`${API_URL}?action=logout&sessionToken=${sessionToken}`);
-        localStorage.removeItem('sessionToken');
-    }
-    window.location.href = API_URL;
-}
 
 window.performSearch = performSearch;
 
@@ -106,9 +75,7 @@ async function performSearch() {
     if (searchInput) searchInput.disabled = true;
 
     try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionToken = urlParams.get('session');
-        const response = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(searchTerm)}&sessionToken=${sessionToken}`);
+        const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -221,37 +188,39 @@ function setupScrollFadeEffect() {
     const scrollContainer = document.querySelector('.split-right');
     if (!scrollContainer) return;
     
+    const allCards = scrollContainer.querySelectorAll('.result-card, .mini-card');
+    allCards.forEach(card => {
+        card.style.opacity = '1';
+        card.classList.remove('fading', 'faded-out');
+    });
+    
     const updateFadeEffect = () => {
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const containerCenter = containerRect.top + containerRect.height / 2;
-        const visibleRange = containerRect.height / 2.5;
+        const scrollTop = scrollContainer.scrollTop;
+        const containerHeight = scrollContainer.clientHeight;
         
         const cards = scrollContainer.querySelectorAll('.result-card, .mini-card');
         
         cards.forEach(card => {
-            const cardRect = card.getBoundingClientRect();
-            const cardCenter = cardRect.top + cardRect.height / 2;
-            const distanceFromCenter = Math.abs(cardCenter - containerCenter);
+            const cardTop = card.offsetTop;
+            const cardHeight = card.offsetHeight;
+            const cardCenter = cardTop + cardHeight / 2;
+            const scrollCenter = scrollTop + containerHeight / 2;
             
-            if (distanceFromCenter > visibleRange) {
-                const opacity = Math.max(0.15, 1 - (distanceFromCenter - visibleRange) / visibleRange);
+            const distanceFromCenter = Math.abs(cardCenter - scrollCenter);
+            const maxDistance = containerHeight / 2;
+            
+            if (distanceFromCenter > maxDistance) {
+                let opacity = 1 - (distanceFromCenter - maxDistance) / maxDistance;
+                opacity = Math.max(0.15, Math.min(1, opacity));
                 card.style.opacity = opacity;
-                if (opacity < 0.3) {
-                    card.classList.add('faded-out');
-                } else {
-                    card.classList.remove('faded-out');
-                }
             } else {
                 card.style.opacity = 1;
-                card.classList.remove('faded-out');
             }
         });
     };
     
     scrollContainer.addEventListener('scroll', () => {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        updateFadeEffect();
-        scrollTimeout = setTimeout(() => updateFadeEffect(), 100);
+        requestAnimationFrame(updateFadeEffect);
     });
     
     updateFadeEffect();
@@ -279,6 +248,8 @@ window.showAccountDetails = function(index) {
         
         const splitRight = document.querySelector('.split-right');
         if (splitRight) splitRight.scrollTop = 0;
+        
+        setTimeout(() => setupScrollFadeEffect(), 0);
     }
 };
 
@@ -452,10 +423,7 @@ function displayResult(data) {
     resultDiv.innerHTML = generateFullDetailCard(data);
     
     setTimeout(() => {
-        const splitRight = document.querySelector('.split-right');
-        if (splitRight) {
-            setupScrollFadeEffect();
-        }
+        setupScrollFadeEffect();
     }, 0);
 }
 
@@ -488,7 +456,5 @@ function escapeHtml(text) {
 }
 
 window.addEventListener('load', function() {
-    validateSession().then(() => {
-        attachEventListeners('');
-    });
+    attachEventListeners('');
 });
