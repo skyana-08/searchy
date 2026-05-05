@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Secure Login - SBC Account Checker">
+    <title>Login · CheckMyCH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sb-blue-900: #001a4d;
+            --sb-blue-800: #002470;
+            --sb-blue-700: #003087;
+            --sb-blue-600: #0047bb;
+            --sb-blue-500: #1a5fd6;
+            --sb-blue-400: #4d84e2;
+            --sb-blue-300: #80aaea;
+            --sb-blue-200: #b3cff5;
+            --sb-green-700: #00612f;
+            --sb-green-600: #00843d;
+            --sb-green-500: #00a651;
+            --sb-green-400: #33bb73;
+            --sb-green-300: #66d096;
+            --success: #00a651;
+            --error:   #dc2626;
+            --font-display: 'Lato', sans-serif;
+            --font-body:    'Lato', sans-serif;
+            --font-mono:    'DM Mono', monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg-base: #04111f;
+            --bg-nav: rgba(4, 17, 31, 0.95);
+            --bg-card: #071d35;
+            --bg-input: #0a2040;
+            --border-input: rgba(77,132,226,0.4);
+            --border-input-focus: rgba(77,132,226,0.75);
+            --text-primary: #ddeeff;
+            --text-secondary: #9dbbd8;
+            --text-muted: #6e99bb;
+            --text-heading: #ffffff;
+            --ambient-1: rgba(0,48,135,0.5);
+            --ambient-2: rgba(0,134,61,0.1);
+            --eyebrow-bg: rgba(77,132,226,0.14);
+            --eyebrow-border: rgba(77,132,226,0.38);
+            --eyebrow-color: #93c5fd;
+            --grid-line: rgba(77,132,226,0.04);
+            --border-nav: rgba(255,255,255,0.08);
+            --bg-tag: rgba(255,255,255,0.06);
+        }
+
+        [data-theme="light"] {
+            --bg-base: #eef4ff;
+            --bg-nav: rgba(255,255,255,0.96);
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --border-input: rgba(0,71,187,0.32);
+            --border-input-focus: rgba(0,71,187,0.62);
+            --text-primary: #0b1c35;
+            --text-secondary: #1a3560;
+            --text-muted: #2d5080;
+            --text-heading: #001340;
+            --ambient-1: rgba(0,71,187,0.065);
+            --ambient-2: rgba(0,134,61,0.05);
+            --eyebrow-bg: rgba(0,71,187,0.08);
+            --eyebrow-border: rgba(0,71,187,0.28);
+            --eyebrow-color: #002a7a;
+            --grid-line: rgba(0,48,135,0.045);
+            --border-nav: rgba(0,48,135,0.12);
+            --bg-tag: rgba(0,48,135,0.05);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-base);
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ambient {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(80px);
+        }
+        .ambient-1 {
+            width: 500px;
+            height: 500px;
+            top: -150px;
+            right: -100px;
+            background: radial-gradient(circle, var(--ambient-1) 0%, transparent 70%);
+        }
+        .ambient-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            left: -80px;
+            background: radial-gradient(circle, var(--ambient-2) 0%, transparent 70%);
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            height: 56px;
+            border-bottom: 1px solid var(--border-nav);
+            background: var(--bg-nav);
+            backdrop-filter: blur(12px);
+        }
+        .topbar-brand { display: flex; align-items: center; gap: 10px; }
+        .topbar-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 1px solid rgba(0,166,81,0.35); }
+        .topbar-name { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.05em; }
+        [data-theme="dark"] .topbar-name span { color: var(--sb-green-400); }
+        [data-theme="light"] .topbar-name span { color: var(--sb-green-600); }
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+        .theme-toggle { width: 34px; height: 34px; border-radius: 8px; background: var(--bg-tag); border: 1px solid var(--border-input); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s ease; }
+        .theme-toggle:hover { transform: scale(1.08); }
+        .theme-icon { display: none; }
+        [data-theme="dark"] .theme-icon-dark { display: block; }
+        [data-theme="light"] .theme-icon-light { display: block; }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            margin: auto;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 48px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--eyebrow-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            border: 1px solid rgba(0,166,81,0.35);
+        }
+
+        .login-header h1 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-heading);
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-input);
+            border-radius: 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--border-input-focus);
+            box-shadow: 0 0 0 4px rgba(0,71,187,0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,71,187,0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.error {
+            display: block;
+            background: rgba(220, 38, 38, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(0, 166, 81, 0.1);
+            color: #00c853;
+            border: 1px solid rgba(0, 166, 81, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 440px;
+            width: 100%;
+            border: 1px solid var(--eyebrow-border);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            color: var(--text-heading);
+            margin-bottom: 8px;
+        }
+
+        .modal-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            float: right;
+        }
+
+        @media (max-width: 560px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+            .login-header h1 {
+                font-size: 24px;
+            }
+            .topbar {
+                padding: 0 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
+
+    <nav class="topbar">
+        <div class="topbar-brand">
+            <div class="topbar-logo">🔮</div>
+            <span class="topbar-name">Check<span>MyCH</span></span>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode">
+                <span class="theme-icon theme-icon-dark">🌙</span>
+                <span class="theme-icon theme-icon-light">☀️</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">🔮</div>
+                <h1>Check<span style="color: var(--sb-green-400);">MyCH</span></h1>
+                <p>Sign in to access the database</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>EMAIL ADDRESS</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        <input type="email" id="email" placeholder="your@email.com" required autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span>Sign In</span>
+                </button>
+
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div style="text-align: right;">
+                <button class="close-modal" onclick="closePasswordModal()">&times;</button>
+            </div>
+            <div class="modal-header">
+                <h2>🔐 Change Password</h2>
+                <p>For security reasons, please change your password</p>
+            </div>
+            <form id="passwordChangeForm">
+                <div class="form-group">
+                    <label>CURRENT PASSWORD</label>
+                    <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                </div>
+                <div class="form-group">
+                    <label>NEW PASSWORD</label>
+                    <input type="password" id="newPassword" placeholder="Enter new password" required>
+                </div>
+                <div class="form-group">
+                    <label>CONFIRM NEW PASSWORD</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                </div>
+                <button type="submit" class="login-btn">Update Password</button>
+                <div id="passwordMessage" class="message" style="margin-top: 16px;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('checkmych-theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            // Icon updates automatically via CSS
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('checkmych-theme');
+            const theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('message');
+            
+            if (!email || !password) {
+                showMessage('Please enter both email and password', 'error');
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span>⏳ Authenticating...</span>';
+            messageDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.requiresPasswordChange) {
+                        window.pendingUserData = data;
+                        showPasswordModal();
+                        showMessage('Please change your password to continue', 'success');
+                    } else {
+                        window.location.href = '/main.html';
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                    if (data.inactive) {
+                        showMessage('⚠️ This Account is INACTIVE. Please contact administrator.', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('Connection error. Please try again.', 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Sign In</span>';
+            }
+        });
+
+        document.getElementById('passwordChangeForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordMessage = document.getElementById('passwordMessage');
+            
+            if (newPassword !== confirmPassword) {
+                passwordMessage.textContent = 'New passwords do not match';
+                passwordMessage.className = 'message error';
+                passwordMessage.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                passwordMessage.textContent = 'Password must be at least 6 characters';
+                passwordMessage.className = 'message error';
+                passwordMessage.style.display = 'block';
+                return;
+            }
+            
+            const changeBtn = event.target.querySelector('button[type="submit"]');
+            changeBtn.disabled = true;
+            changeBtn.innerHTML = '<span>⏳ Updating...</span>';
+            
+            try {
+                const response = await fetch(`${API_URL}/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: window.pendingUserData.email,
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    passwordMessage.textContent = 'Password changed successfully! Redirecting...';
+                    passwordMessage.className = 'message success';
+                    passwordMessage.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/main.html';
+                    }, 1500);
+                } else {
+                    passwordMessage.textContent = data.message;
+                    passwordMessage.className = 'message error';
+                    passwordMessage.style.display = 'block';
+                    changeBtn.disabled = false;
+                    changeBtn.innerHTML = '<span>Update Password</span>';
+                }
+            } catch (error) {
+                console.error('Password change error:', error);
+                passwordMessage.textContent = 'Connection error. Please try again.';
+                passwordMessage.className = 'message error';
+                passwordMessage.style.display = 'block';
+                changeBtn.disabled = false;
+                changeBtn.innerHTML = '<span>Update Password</span>';
+            }
+        });
+
+        function showPasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            modal.classList.add('active');
+        }
+
+        window.closePasswordModal = function() {
+            const modal = document.getElementById('passwordModal');
+            modal.classList.remove('active');
+            document.getElementById('passwordChangeForm').reset();
+            document.getElementById('passwordMessage').style.display = 'none';
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        async function checkExistingSession() {
+            try {
+                const response = await fetch(`${API_URL}/check-session`);
+                const data = await response.json();
+                
+                if (data.valid) {
+                    window.location.href = '/main.html';
+                }
+            } catch (error) {
+                console.error('Session check error:', error);
+            }
+        }
+
+        initTheme();
+        checkExistingSession();
+    </script>
+</body>
+</html>
