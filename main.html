@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <?!= include('main-css'); ?>
 </head>
 <body>
     <div class="ambient ambient-1"></div>
@@ -29,6 +29,9 @@
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode">
                 <span class="theme-icon theme-icon-dark">🌙</span>
                 <span class="theme-icon theme-icon-light">☀️</span>
+            </button>
+            <button class="logout-btn" onclick="handleLogout()" aria-label="Logout">
+                <span>🚪</span>
             </button>
         </div>
     </nav>
@@ -77,6 +80,6 @@
         <span class="footer-copy">Field Visit Verification Portal</span>
     </footer>
 
-    <script src="script.js"></script>
+    <?!= include('main-js'); ?>
 </body>
 </html>
