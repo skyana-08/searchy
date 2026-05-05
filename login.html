@@ -2,22 +2,35 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Login · CheckMyCH</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="SBC CH Code Checker — Login">
+    <title>CheckMyCH | Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         :root {
-            --sb-blue-600: #0047bb;
+            --sb-blue-900: #001a4d;
             --sb-blue-800: #002470;
+            --sb-blue-700: #003087;
+            --sb-blue-600: #0047bb;
+            --sb-blue-500: #1a5fd6;
+            --sb-blue-400: #4d84e2;
+            --sb-blue-300: #80aaea;
+            --sb-blue-200: #b3cff5;
+            --sb-green-700: #00612f;
+            --sb-green-600: #00843d;
+            --sb-green-500: #00a651;
             --sb-green-400: #33bb73;
+            --sb-green-300: #66d096;
+            --success: #00a651;
+            --error: #dc2626;
             --font-display: 'Lato', sans-serif;
             --font-body: 'Lato', sans-serif;
             --font-mono: 'DM Mono', monospace;
@@ -25,44 +38,41 @@
 
         [data-theme="dark"] {
             --bg-base: #04111f;
-            --bg-card: #071d35;
-            --bg-input: #0a2040;
-            --border-input: rgba(77,132,226,0.4);
-            --border-input-focus: rgba(77,132,226,0.75);
+            --bg-card: rgba(7, 29, 53, 0.95);
+            --bg-input: rgba(10, 32, 64, 0.9);
+            --border-input: rgba(77, 132, 226, 0.4);
+            --border-input-focus: rgba(77, 132, 226, 0.9);
             --text-primary: #ddeeff;
             --text-secondary: #9dbbd8;
             --text-muted: #6e99bb;
             --text-heading: #ffffff;
-            --ambient-1: rgba(0,48,135,0.5);
-            --ambient-2: rgba(0,134,61,0.1);
-            --eyebrow-border: rgba(77,132,226,0.38);
-            --grid-line: rgba(77,132,226,0.04);
-            --border-nav: rgba(255,255,255,0.08);
+            --shadow-glow: 0 0 20px rgba(77, 132, 226, 0.3);
             --bg-tag: rgba(255,255,255,0.06);
+            --border-tag: rgba(255,255,255,0.1);
+            --bg-tag-hover: rgba(77,132,226,0.22);
         }
 
         [data-theme="light"] {
             --bg-base: #eef4ff;
-            --bg-card: #ffffff;
+            --bg-card: rgba(255,255,255,0.98);
             --bg-input: #ffffff;
-            --border-input: rgba(0,71,187,0.32);
-            --border-input-focus: rgba(0,71,187,0.62);
+            --border-input: rgba(0, 71, 187, 0.32);
+            --border-input-focus: rgba(0, 71, 187, 0.7);
             --text-primary: #0b1c35;
             --text-secondary: #1a3560;
             --text-muted: #2d5080;
             --text-heading: #001340;
-            --ambient-1: rgba(0,71,187,0.065);
-            --ambient-2: rgba(0,134,61,0.05);
-            --eyebrow-border: rgba(0,71,187,0.28);
-            --grid-line: rgba(0,48,135,0.045);
-            --border-nav: rgba(0,48,135,0.12);
+            --shadow-glow: 0 0 20px rgba(0, 71, 187, 0.15);
             --bg-tag: rgba(0,48,135,0.05);
+            --border-tag: rgba(0,48,135,0.13);
+            --bg-tag-hover: rgba(0,71,187,0.12);
         }
 
         body {
             font-family: var(--font-body);
             background-color: var(--bg-base);
             min-height: 100vh;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -75,7 +85,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(77, 132, 226, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(77, 132, 226, 0.04) 1px, transparent 1px);
             background-size: 48px 48px;
             pointer-events: none;
             z-index: 0;
@@ -88,174 +98,181 @@
             z-index: 0;
             filter: blur(80px);
         }
+
         .ambient-1 {
             width: 500px;
             height: 500px;
             top: -150px;
             right: -100px;
-            background: radial-gradient(circle, var(--ambient-1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 48, 135, 0.5) 0%, transparent 70%);
         }
+
         .ambient-2 {
             width: 400px;
             height: 400px;
             bottom: -100px;
             left: -80px;
-            background: radial-gradient(circle, var(--ambient-2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 134, 61, 0.1) 0%, transparent 70%);
         }
-
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 48px;
-            height: 56px;
-            border-bottom: 1px solid var(--border-nav);
-            background: var(--bg-base);
-            backdrop-filter: blur(12px);
-        }
-        .topbar-brand { display: flex; align-items: center; gap: 10px; }
-        .topbar-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .topbar-name { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-secondary); }
-        [data-theme="dark"] .topbar-name span { color: var(--sb-green-400); }
-        [data-theme="light"] .topbar-name span { color: var(--sb-green-400); }
-        .theme-toggle { width: 34px; height: 34px; border-radius: 8px; background: var(--bg-tag); border: 1px solid var(--border-input); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; }
 
         .login-container {
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 480px;
-            margin: auto;
+            max-width: 450px;
+            animation: fadeInUp 0.6s ease-out;
         }
 
         .login-card {
             background: var(--bg-card);
-            border-radius: 32px;
-            padding: 48px 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--eyebrow-border);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px 32px;
+            border: 1px solid var(--border-tag);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        .login-header {
+        .logo {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
 
-        .login-logo {
-            width: 64px;
-            height: 64px;
+        .logo-icon {
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
-            border-radius: 20px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            margin: 0 auto 20px;
-        }
-
-        .login-header h1 {
-            font-family: var(--font-display);
             font-size: 28px;
-            font-weight: 900;
-            color: var(--text-heading);
+            margin: 0 auto 16px;
+            border: 1px solid rgba(0, 166, 81, 0.35);
         }
 
-        .login-header p {
+        .logo h1 {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .logo h1 span {
+            color: var(--sb-green-400);
+        }
+
+        .logo p {
+            font-size: 13px;
             color: var(--text-muted);
-            font-size: 14px;
             margin-top: 8px;
         }
 
-        .form-group {
-            margin-bottom: 24px;
+        .input-group {
+            margin-bottom: 20px;
         }
 
-        .form-group label {
+        .input-group label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            font-size: 12px;
             font-family: var(--font-mono);
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
+            font-weight: 600;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
-        .form-group input {
+        .input-field {
             width: 100%;
-            padding: 14px 16px 14px 48px;
             background: var(--bg-input);
             border: 1px solid var(--border-input);
-            border-radius: 14px;
+            border-radius: 12px;
+            padding: 14px 18px;
             font-size: 15px;
             color: var(--text-primary);
             font-family: var(--font-body);
+            transition: all 0.25s ease;
         }
 
-        .form-group input:focus {
+        .input-field:focus {
             outline: none;
             border-color: var(--border-input-focus);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
         }
 
         .login-btn {
             width: 100%;
-            padding: 14px;
+            padding: 14px 28px;
             background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
-            border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             color: white;
-            font-weight: 700;
-            font-size: 16px;
+            font-weight: 600;
+            font-size: 15px;
             cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
             margin-top: 8px;
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 71, 187, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
         }
 
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .message {
-            margin-top: 20px;
-            padding: 12px;
+        .error-message {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.3);
             border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #ef4444;
             font-size: 13px;
             text-align: center;
-            display: none;
         }
 
-        .message.error {
-            display: block;
-            background: rgba(220, 38, 38, 0.1);
-            color: #ff6b6b;
-            border: 1px solid rgba(220, 38, 38, 0.2);
+        .footer-links {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
-        .message.success {
-            display: block;
-            background: rgba(0, 166, 81, 0.1);
-            color: #00c853;
-            border: 1px solid rgba(0, 166, 81, 0.2);
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-tag);
+            border: 1px solid var(--border-tag);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tag-hover);
+            transform: scale(1.05);
         }
 
         .modal {
@@ -270,7 +287,6 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
         }
 
         .modal.active {
@@ -281,36 +297,100 @@
             background: var(--bg-card);
             border-radius: 24px;
             padding: 32px;
-            max-width: 440px;
-            width: 100%;
-            border: 1px solid var(--eyebrow-border);
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid var(--border-tag);
+            animation: fadeInUp 0.3s ease-out;
         }
 
-        .modal-header {
-            text-align: center;
+        .modal-content h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            color: var(--text-heading);
+        }
+
+        .modal-content p {
+            color: var(--text-muted);
+            font-size: 14px;
             margin-bottom: 24px;
         }
 
-        .modal-header h2 {
-            color: var(--text-heading);
-            margin-bottom: 8px;
+        .modal-content .input-group {
+            margin-bottom: 20px;
         }
 
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
-            color: var(--text-muted);
-            float: right;
+            transition: all 0.2s ease;
         }
 
-        @media (max-width: 560px) {
-            .login-card {
-                padding: 32px 24px;
+        .modal-buttons .btn-primary {
+            background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
+            border: none;
+            color: white;
+        }
+
+        .modal-buttons .btn-secondary {
+            background: var(--bg-tag);
+            border: 1px solid var(--border-tag);
+            color: var(--text-secondary);
+        }
+
+        .inactive-modal .modal-content {
+            text-align: center;
+        }
+        
+        .inactive-modal .warning-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .inactive-modal h2 {
+            color: #ef4444;
+        }
+        
+        .inactive-modal .btn-primary {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            .topbar {
-                padding: 0 18px;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 24px;
+            }
+            
+            .logo-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+            }
+            
+            .logo h1 {
+                font-size: 16px;
+            }
+            
+            .input-field {
+                padding: 12px 16px;
             }
         }
     </style>
@@ -319,79 +399,88 @@
     <div class="ambient ambient-1"></div>
     <div class="ambient ambient-2"></div>
 
-    <nav class="topbar">
-        <div class="topbar-brand">
-            <div class="topbar-logo">🔮</div>
-            <span class="topbar-name">Check<span>MyCH</span></span>
-        </div>
-        <div class="topbar-right">
-            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-        </div>
-    </nav>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span class="theme-icon-dark">🌙</span>
+        <span class="theme-icon-light">☀️</span>
+    </button>
 
     <div class="login-container">
         <div class="login-card">
-            <div class="login-header">
-                <div class="login-logo">🔮</div>
-                <h1>Check<span style="color: var(--sb-green-400);">MyCH</span></h1>
-                <p>Sign in to access the database</p>
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <h1>Check<span>MyCH</span></h1>
+                <p>Field Visit Verification System</p>
             </div>
 
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>EMAIL ADDRESS</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">📧</span>
-                        <input type="email" id="email" placeholder="your@email.com" required>
-                    </div>
-                </div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
 
-                <div class="form-group">
-                    <label>PASSWORD</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">🔒</span>
-                        <input type="password" id="password" placeholder="Enter your password" required>
-                    </div>
-                </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" class="input-field" placeholder="Enter your email" autocomplete="off">
+            </div>
 
-                <button type="submit" class="login-btn">Sign In</button>
-                <div id="message" class="message"></div>
-            </form>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" class="input-field" placeholder="Enter your password">
+            </div>
+
+            <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+                <span>Login</span>
+            </button>
+
+            <div class="footer-links">
+                <span>Authorized personnel only</span>
+            </div>
         </div>
     </div>
 
-    <div id="passwordModal" class="modal">
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
         <div class="modal-content">
-            <div style="text-align: right;">
-                <button class="close-modal" onclick="closePasswordModal()">&times;</button>
+            <h2>Change Password</h2>
+            <p>This is your first time logging in. Please change your password to continue.</p>
+            
+            <div class="input-group">
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" class="input-field" placeholder="Enter current password">
             </div>
-            <div class="modal-header">
-                <h2>🔐 Change Password</h2>
-                <p>For security reasons, please change your password</p>
+            
+            <div class="input-group">
+                <label>New Password</label>
+                <input type="password" id="newPassword" class="input-field" placeholder="Enter new password (min. 6 characters)">
             </div>
-            <form id="passwordChangeForm">
-                <div class="form-group">
-                    <label>CURRENT PASSWORD</label>
-                    <input type="password" id="currentPassword" required>
-                </div>
-                <div class="form-group">
-                    <label>NEW PASSWORD</label>
-                    <input type="password" id="newPassword" required>
-                </div>
-                <div class="form-group">
-                    <label>CONFIRM NEW PASSWORD</label>
-                    <input type="password" id="confirmPassword" required>
-                </div>
-                <button type="submit" class="login-btn">Update Password</button>
-                <div id="passwordMessage" class="message"></div>
-            </form>
+            
+            <div class="input-group">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPassword" class="input-field" placeholder="Confirm new password">
+            </div>
+            
+            <div id="modalError" class="error-message" style="display: none;"></div>
+            
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="submitPasswordChange()">Change Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inactive Account Modal -->
+    <div id="inactiveModal" class="modal inactive-modal">
+        <div class="modal-content">
+            <div class="warning-icon">⚠️</div>
+            <h2>Account Inactive</h2>
+            <p>Your account is no longer active. Please contact the administrator for assistance.</p>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="closeInactiveModal()">OK</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const API_URL = window.location.href.split('?')[0];
-        let currentSessionToken = null;
-        let pendingUserData = null;
+        // Replace with your actual Apps Script URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycby4RpnUZ-FK4_Xs3PWXt_J-QdGdDoDiMuhKXFvkeME5a6qaunPBYjm0V6heaizxpo4z/exec';
+        
+        let currentEmail = '';
+        let currentFullName = '';
 
         function toggleTheme() {
             const html = document.documentElement;
@@ -399,148 +488,168 @@
             const next = current === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-theme', next);
             localStorage.setItem('checkmych-theme', next);
-        }
-
-        function initTheme() {
-            const saved = localStorage.getItem('checkmych-theme');
-            const theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
             
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const darkIcon = document.querySelector('.theme-icon-dark');
+            const lightIcon = document.querySelector('.theme-icon-light');
+            if (darkIcon && lightIcon) {
+                darkIcon.style.display = isDark ? 'block' : 'none';
+                lightIcon.style.display = isDark ? 'none' : 'block';
+            }
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('checkmych-theme');
+            if (saved === 'light' || saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+            updateThemeIcons();
+        })();
+
+        function closeInactiveModal() {
+            document.getElementById('inactiveModal').classList.remove('active');
+        }
+
+        async function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const loginBtn = e.target.querySelector('button');
-            const messageDiv = document.getElementById('message');
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('errorMessage');
             
             if (!email || !password) {
-                showMessage('Please enter both email and password', 'error');
+                showError('Please enter both email and password', errorDiv);
                 return;
             }
             
             loginBtn.disabled = true;
-            loginBtn.innerHTML = '⏳ Authenticating...';
-            messageDiv.style.display = 'none';
+            loginBtn.innerHTML = '<span>Logging in...</span>';
+            errorDiv.style.display = 'none';
             
             try {
-                const response = await fetch(`${API_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                const response = await fetch(`${API_URL}?path=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
                 const data = await response.json();
                 
                 if (data.success) {
-                    currentSessionToken = data.sessionToken;
-                    localStorage.setItem('sessionToken', currentSessionToken);
+                    currentEmail = data.email;
+                    currentFullName = data.fullName;
                     
-                    if (data.requiresPasswordChange) {
-                        pendingUserData = data;
-                        document.getElementById('passwordModal').classList.add('active');
-                        showMessage('Please change your password to continue', 'success');
+                    if (data.isFirstLogin) {
+                        openChangePasswordModal();
                     } else {
-                        window.location.href = `${API_URL}?page=main&session=${currentSessionToken}`;
+                        localStorage.setItem('checkmych-session', data.sessionToken);
+                        localStorage.setItem('checkmych-email', data.email);
+                        localStorage.setItem('checkmych-fullname', data.fullName);
+                        localStorage.setItem('checkmych-userid', data.userId || '');
+                        localStorage.setItem('checkmych-role', data.role || '');
+                        window.location.href = 'index.html';
                     }
                 } else {
-                    showMessage(data.message, 'error');
                     if (data.inactive) {
-                        showMessage('⚠️ This Account is INACTIVE. Please contact administrator.', 'error');
+                        openInactiveModal();
+                    } else {
+                        showError(data.message, errorDiv);
                     }
                 }
             } catch (error) {
-                showMessage('Connection error. Please try again.', 'error');
+                showError('Connection error. Please try again.', errorDiv);
+                console.error('Login error:', error);
             } finally {
                 loginBtn.disabled = false;
-                loginBtn.innerHTML = 'Sign In';
+                loginBtn.innerHTML = '<span>Login</span>';
             }
-        });
-
-        document.getElementById('passwordChangeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        }
+        
+        function openInactiveModal() {
+            const modal = document.getElementById('inactiveModal');
+            modal.classList.add('active');
+        }
+        
+        function openChangePasswordModal() {
+            const modal = document.getElementById('changePasswordModal');
+            modal.classList.add('active');
             
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('modalError').style.display = 'none';
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('changePasswordModal');
+            modal.classList.remove('active');
+        }
+        
+        async function submitPasswordChange() {
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const passwordMessage = document.getElementById('passwordMessage');
+            const modalError = document.getElementById('modalError');
+            const submitBtn = document.querySelector('#changePasswordModal .btn-primary');
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showError('Please fill in all fields', modalError);
+                return;
+            }
             
             if (newPassword !== confirmPassword) {
-                passwordMessage.textContent = 'New passwords do not match';
-                passwordMessage.className = 'message error';
-                passwordMessage.style.display = 'block';
+                showError('New passwords do not match', modalError);
                 return;
             }
             
             if (newPassword.length < 6) {
-                passwordMessage.textContent = 'Password must be at least 6 characters';
-                passwordMessage.className = 'message error';
-                passwordMessage.style.display = 'block';
+                showError('Password must be at least 6 characters', modalError);
                 return;
             }
             
-            const changeBtn = e.target.querySelector('button');
-            changeBtn.disabled = true;
-            changeBtn.innerHTML = '⏳ Updating...';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Changing...';
+            modalError.style.display = 'none';
             
             try {
-                const response = await fetch(`${API_URL}?action=changePassword&email=${encodeURIComponent(pendingUserData.email)}&currentPassword=${encodeURIComponent(currentPassword)}&newPassword=${encodeURIComponent(newPassword)}&sessionToken=${currentSessionToken}`);
+                const response = await fetch(`${API_URL}?path=changePassword&email=${encodeURIComponent(currentEmail)}&oldPassword=${encodeURIComponent(currentPassword)}&newPassword=${encodeURIComponent(newPassword)}`);
                 const data = await response.json();
                 
                 if (data.success) {
-                    passwordMessage.textContent = 'Password changed successfully! Redirecting...';
-                    passwordMessage.className = 'message success';
-                    passwordMessage.style.display = 'block';
-                    setTimeout(() => {
-                        window.location.href = `${API_URL}?page=main&session=${currentSessionToken}`;
-                    }, 1500);
+                    closeModal();
+                    localStorage.setItem('checkmych-session', 'session_' + Date.now());
+                    localStorage.setItem('checkmych-email', currentEmail);
+                    localStorage.setItem('checkmych-fullname', currentFullName);
+                    window.location.href = 'index.html';
                 } else {
-                    passwordMessage.textContent = data.message;
-                    passwordMessage.className = 'message error';
-                    passwordMessage.style.display = 'block';
-                    changeBtn.disabled = false;
-                    changeBtn.innerHTML = 'Update Password';
+                    showError(data.message, modalError);
                 }
             } catch (error) {
-                passwordMessage.textContent = 'Connection error. Please try again.';
-                passwordMessage.className = 'message error';
-                passwordMessage.style.display = 'block';
-                changeBtn.disabled = false;
-                changeBtn.innerHTML = 'Update Password';
+                showError('Connection error. Please try again.', modalError);
+                console.error('Password change error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Change Password';
             }
-        });
-
-        window.closePasswordModal = function() {
-            document.getElementById('passwordModal').classList.remove('active');
-            document.getElementById('passwordChangeForm').reset();
-            document.getElementById('passwordMessage').style.display = 'none';
-        };
-
-        function showMessage(message, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
+        }
+        
+        function showError(message, errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
             setTimeout(() => {
-                messageDiv.style.display = 'none';
+                errorDiv.style.display = 'none';
             }, 5000);
         }
-
-        async function checkExistingSession() {
-            const sessionToken = localStorage.getItem('sessionToken');
-            if (sessionToken) {
-                try {
-                    const response = await fetch(`${API_URL}?action=checkSession&sessionToken=${sessionToken}`);
-                    const data = await response.json();
-                    if (data.valid) {
-                        window.location.href = `${API_URL}?page=main&session=${sessionToken}`;
-                    } else {
-                        localStorage.removeItem('sessionToken');
-                    }
-                } catch (error) {
-                    console.error('Session check error:', error);
-                }
+        
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleLogin();
             }
-        }
-
-        initTheme();
-        checkExistingSession();
+        });
+        
+        document.getElementById('email').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
     </script>
 </body>
 </html>
