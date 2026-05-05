@@ -1,40 +1,4 @@
-const API_URL = '/api';
-let sessionToken = null;
-
-// Get session token from URL (for compatibility)
-function getSessionFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('session');
-}
-
-// Validate session on page load
-async function validateSession() {
-    try {
-        const response = await fetch(`${API_URL}/check-session`);
-        const data = await response.json();
-        
-        if (!data.valid) {
-            window.location.href = '/';
-            return false;
-        }
-        return true;
-    } catch (error) {
-        console.error('Session validation error:', error);
-        window.location.href = '/';
-        return false;
-    }
-}
-
-// Handle logout - ADD THIS FUNCTION
-async function handleLogout() {
-    try {
-        await fetch(`${API_URL}/logout`, { method: 'POST' });
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
-    window.location.href = '/';
-}
-
+const API_URL = window.location.href.split('?')[0];
 let isSplitMode = false;
 let currentAccounts = [];
 let scrollTimeout = null;
@@ -53,6 +17,42 @@ function toggleTheme() {
         document.documentElement.setAttribute('data-theme', saved);
     }
 })();
+
+async function validateSession() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('session');
+    
+    if (!sessionToken) {
+        window.location.href = API_URL;
+        return false;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}?action=checkSession&sessionToken=${sessionToken}`);
+        const data = await response.json();
+        
+        if (!data.valid) {
+            localStorage.removeItem('sessionToken');
+            window.location.href = API_URL;
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Session validation error:', error);
+        window.location.href = API_URL;
+        return false;
+    }
+}
+
+async function handleLogout() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('session');
+    if (sessionToken) {
+        await fetch(`${API_URL}?action=logout&sessionToken=${sessionToken}`);
+        localStorage.removeItem('sessionToken');
+    }
+    window.location.href = API_URL;
+}
 
 window.performSearch = performSearch;
 
@@ -101,7 +101,9 @@ async function performSearch() {
     if (searchInput) searchInput.disabled = true;
 
     try {
-        const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(searchTerm)}`);
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionToken = urlParams.get('session');
+        const response = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(searchTerm)}&sessionToken=${sessionToken}`);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
