@@ -1,4 +1,9 @@
-const API_URL = window.location.href.split('?')[0];
+// ============================================
+// PUT YOUR WEB APP URL HERE - CHANGE THIS ONLY
+// ============================================
+const API_URL = 'https://script.google.com/macros/s/AKfycby4RpnUZ-FK4_Xs3PWXt_J-QdGdDoDiMuhKXFvkeME5a6qaunPBYjm0V6heaizxpo4z/exec';
+// ============================================
+
 let isSplitMode = false;
 let currentAccounts = [];
 let scrollTimeout = null;
