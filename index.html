@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="SBC CH Code Checker — Field Visit Database">
     <title>CheckMyCH | Field Visit Database</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,12 +11,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <script>
+        // Session check - redirect to login if not authenticated
+        (function checkSession() {
+            const sessionToken = localStorage.getItem('checkmych-session');
+            const userEmail = localStorage.getItem('checkmych-email');
+            
+            if (!sessionToken || !userEmail) {
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+
     <div class="ambient ambient-1"></div>
     <div class="ambient ambient-2"></div>
 
     <nav class="topbar">
         <div class="topbar-brand">
-            <div class="topbar-logo">🔮</div>
+            <div class="topbar-logo">🔐</div>
             <span class="topbar-name">Check<span>MyCH</span></span>
         </div>
         <div class="topbar-right">
@@ -26,12 +38,12 @@
                 <span class="status-divider">·</span>
                 <span class="status-live">Live</span>
             </div>
+            <button class="logout-btn" id="logoutBtn" onclick="logout()" title="Logout">
+                <span>🚪</span>
+            </button>
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light/dark mode">
                 <span class="theme-icon theme-icon-dark">🌙</span>
                 <span class="theme-icon theme-icon-light">☀️</span>
-            </button>
-            <button class="logout-btn" onclick="handleLogout()" aria-label="Logout" style="width:34px;height:34px;border-radius:8px;background:var(--bg-tag);border:1px solid var(--border-tag);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;">
-                <span>🚪</span>
             </button>
         </div>
     </nav>
