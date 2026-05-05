@@ -1,4 +1,39 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbzGZm2zuKUATbQE3ZqMTZusnTZ4MuVP8is3Z57moqAuCxrzqKU4Le4Kw4k8ZDLXf15P/exec';
+const API_URL = '/api';
+let sessionToken = null;
+
+// Get session token from URL (for compatibility)
+function getSessionFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('session');
+}
+
+// Validate session on page load
+async function validateSession() {
+    try {
+        const response = await fetch(`${API_URL}/check-session`);
+        const data = await response.json();
+        
+        if (!data.valid) {
+            window.location.href = '/';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Session validation error:', error);
+        window.location.href = '/';
+        return false;
+    }
+}
+
+// Handle logout - ADD THIS FUNCTION
+async function handleLogout() {
+    try {
+        await fetch(`${API_URL}/logout`, { method: 'POST' });
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+    window.location.href = '/';
+}
 
 let isSplitMode = false;
 let currentAccounts = [];
@@ -66,7 +101,7 @@ async function performSearch() {
     if (searchInput) searchInput.disabled = true;
 
     try {
-        const response = await fetch(`${API_URL}?q=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(searchTerm)}`);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -446,5 +481,7 @@ function escapeHtml(text) {
 }
 
 window.addEventListener('load', function() {
-    attachEventListeners('');
+    validateSession().then(() => {
+        attachEventListeners('');
+    });
 });
