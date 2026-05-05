@@ -154,8 +154,26 @@ body::before {
 .theme-icon { display: none; }
 [data-theme="dark"] .theme-icon-dark { display: block; }
 [data-theme="light"] .theme-icon-light { display: block; }
-.logout-btn { width: 34px; height: 34px; border-radius: 8px; background: var(--bg-tag); border: 1px solid var(--border-tag); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s ease; }
-.logout-btn:hover { background: var(--bg-tag-hover); border-color: var(--border-tag-hover); transform: scale(1.08); }
+
+.logout-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--bg-tag);
+    border: 1px solid var(--border-tag);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: var(--bg-tag-hover);
+    border-color: var(--border-tag-hover);
+    transform: scale(1.08);
+}
 
 .main {
     position: relative; z-index: 1; flex: 1;
@@ -163,6 +181,7 @@ body::before {
     overflow-x: hidden;
 }
 
+/* SPLIT SCREEN MODE - PC: Left on LEFT edge, Right on RIGHT edge */
 .split-mode {
     width: 100%;
     height: calc(100vh - 56px);
@@ -205,23 +224,40 @@ body::before {
     scroll-behavior: smooth;
 }
 
+.split-left .hero {
+    width: 100%;
+    max-width: 450px;
+    margin: 0;
+}
+
+.split-left .search-panel {
+    width: 100%;
+    max-width: 450px;
+    margin-top: 32px;
+    margin-bottom: 0;
+}
+
 .split-right .results-area {
     width: 100%;
     max-width: 750px;
     overflow-x: hidden;
 }
 
+.split-right .result-card {
+    box-shadow: none;
+    border: 1px solid var(--border-detail);
+    width: 100%;
+    margin-bottom: 16px;
+    overflow-x: hidden;
+}
+
+/* Fade effect on scroll */
 .split-right .result-card,
 .split-right .mini-card {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.split-right .result-card.fade-out,
-.split-right .mini-card.fade-out {
-    opacity: 0.15;
-    transform: scale(0.95);
-}
-
+/* Custom scrollbar for right side */
 .split-right::-webkit-scrollbar {
     width: 8px;
     height: 0px;
@@ -241,6 +277,7 @@ body::before {
     background: var(--sb-blue-600);
 }
 
+/* Default main content styling (non-split mode) */
 .main:not(.split-mode) {
     display: flex;
     flex-direction: column;
@@ -280,7 +317,6 @@ body::before {
     box-shadow: 0 20px 60px rgba(0,0,0,0.18); 
     margin-bottom: 16px;
     overflow-x: hidden;
-    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .result-card.success { border: 1px solid var(--border-card-success); }
 .card-header { padding: 24px 28px; display: flex; align-items: center; gap: 16px; background: var(--card-header-success-bg); border-bottom: 1px solid var(--card-header-success-border); flex-wrap: wrap; }
@@ -327,6 +363,10 @@ body::before {
 
 .footer { padding: 18px 48px; border-top: 1px solid var(--border-nav); display: flex; justify-content: space-between; background: var(--bg-footer); font-size: 12px; }
 .footer-tip kbd { padding: 2px 6px; background: var(--kbd-bg); border-radius: 4px; }
+
+/* ============================================ */
+/* MINI CARDS STYLES */
+/* ============================================ */
 
 .mini-cards-container {
     display: flex;
@@ -414,6 +454,7 @@ body::before {
     background: rgba(77, 132, 226, 0.3);
 }
 
+/* Status badge styles for mini cards */
 .mini-card-status {
     display: inline-block;
     padding: 3px 10px;
@@ -434,6 +475,7 @@ body::before {
     color: #ff6b6b;
 }
 
+/* Status badge styles for full detail cards */
 .card-badge-pullout {
     padding: 6px 14px;
     border-radius: 100px;
@@ -492,6 +534,32 @@ body::before {
     transform: translateX(-3px);
 }
 
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mini-card:nth-child(1) { animation-delay: 0.05s; }
+.mini-card:nth-child(2) { animation-delay: 0.1s; }
+.mini-card:nth-child(3) { animation-delay: 0.15s; }
+.mini-card:nth-child(4) { animation-delay: 0.2s; }
+.mini-card:nth-child(5) { animation-delay: 0.25s; }
+.mini-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* ============================================ */
+/* CUSTOM SCROLLBAR STYLES - VERTICAL ONLY */
+/* ============================================ */
+
 ::-webkit-scrollbar {
     width: 10px;
     height: 0px;
@@ -512,6 +580,45 @@ body::before {
     background: var(--sb-blue-600);
     box-shadow: 0 0 8px rgba(77,132,226,0.3);
 }
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-blue-500) var(--bg-input);
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--sb-blue-500), var(--sb-blue-600));
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--sb-blue-400), var(--sb-blue-500));
+    box-shadow: 0 0 10px rgba(77,132,226,0.4);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--sb-blue-400), var(--sb-blue-500));
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--sb-blue-500), var(--sb-blue-600));
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+    transition: all 0.3s ease;
+}
+
+/* ============================================ */
+/* MOBILE RESPONSIVE */
+/* ============================================ */
 
 @media (max-width: 860px) {
     .topbar { padding: 0 18px; }
@@ -611,6 +718,7 @@ body::before {
     }
 }
 
+/* Ensure NO horizontal scroll on any element */
 html, body, .main, .split-mode, .split-container, .split-left, .split-right, .results-area, .result-card, .mini-card {
     max-width: 100%;
     overflow-x: hidden;
