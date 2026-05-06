@@ -181,7 +181,6 @@ body::before {
     overflow-x: hidden;
 }
 
-/* SPLIT SCREEN MODE - PC: Left on LEFT edge, Right on RIGHT edge */
 .split-mode {
     width: 100%;
     height: calc(100vh - 56px);
@@ -251,13 +250,11 @@ body::before {
     overflow-x: hidden;
 }
 
-/* Fade effect on scroll */
 .split-right .result-card,
 .split-right .mini-card {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Custom scrollbar for right side */
 .split-right::-webkit-scrollbar {
     width: 8px;
     height: 0px;
@@ -277,7 +274,6 @@ body::before {
     background: var(--sb-blue-600);
 }
 
-/* Default main content styling (non-split mode) */
 .main:not(.split-mode) {
     display: flex;
     flex-direction: column;
@@ -363,10 +359,6 @@ body::before {
 
 .footer { padding: 18px 48px; border-top: 1px solid var(--border-nav); display: flex; justify-content: space-between; background: var(--bg-footer); font-size: 12px; }
 .footer-tip kbd { padding: 2px 6px; background: var(--kbd-bg); border-radius: 4px; }
-
-/* ============================================ */
-/* MINI CARDS STYLES */
-/* ============================================ */
 
 .mini-cards-container {
     display: flex;
@@ -454,7 +446,6 @@ body::before {
     background: rgba(77, 132, 226, 0.3);
 }
 
-/* Status badge styles for mini cards */
 .mini-card-status {
     display: inline-block;
     padding: 3px 10px;
@@ -475,7 +466,6 @@ body::before {
     color: #ff6b6b;
 }
 
-/* Status badge styles for full detail cards */
 .card-badge-pullout {
     padding: 6px 14px;
     border-radius: 100px;
@@ -534,10 +524,6 @@ body::before {
     transform: translateX(-3px);
 }
 
-/* ============================================ */
-/* ANIMATIONS */
-/* ============================================ */
-
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -555,10 +541,6 @@ body::before {
 .mini-card:nth-child(4) { animation-delay: 0.2s; }
 .mini-card:nth-child(5) { animation-delay: 0.25s; }
 .mini-card:nth-child(6) { animation-delay: 0.3s; }
-
-/* ============================================ */
-/* CUSTOM SCROLLBAR STYLES - VERTICAL ONLY */
-/* ============================================ */
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -615,10 +597,6 @@ html {
 ::-webkit-scrollbar-thumb {
     transition: all 0.3s ease;
 }
-
-/* ============================================ */
-/* MOBILE RESPONSIVE */
-/* ============================================ */
 
 @media (max-width: 860px) {
     .topbar { padding: 0 18px; }
@@ -718,7 +696,6 @@ html {
     }
 }
 
-/* Ensure NO horizontal scroll on any element */
 html, body, .main, .split-mode, .split-container, .split-left, .split-right, .results-area, .result-card, .mini-card {
     max-width: 100%;
     overflow-x: hidden;
