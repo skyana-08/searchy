@@ -259,7 +259,7 @@ function generateFullDetailCard(data) {
     return `
         <div class="result-card">
             <div class="card-header">
-                <div class="card-header-icon">✓</div>
+                <div class="card-header-icon">📋</div>
                 <div class="card-header-info">
                     <div class="card-header-title">Account Verified</div>
                     <div class="card-header-sub">CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT</div>
