@@ -128,7 +128,7 @@ function renderMiniCards(accounts) {
     let resultsHTML = '';
     
     if (needsScrollableContainer) {
-        // WITH scrollable container - limits height
+        // WITH scrollable container - fixed height container in the middle
         resultsHTML = `
             <div class="results-container">
                 <div class="scrollable-container" id="resultsScrollContainer">
@@ -202,16 +202,12 @@ function setupScrollFadeEffect() {
     // Only get the scrollable container if it exists (5+ results)
     let container = document.querySelector('.split-right .scrollable-container');
     if (!container) {
-        // If no scrollable container, use split-right but don't apply fade
-        container = document.querySelector('.split-right');
-        if (container) {
-            // Reset all cards opacity to 1 if no scrollable container
-            const cards = container.querySelectorAll('.mini-card, .result-card');
-            cards.forEach(card => {
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
-            });
-        }
+        // If no scrollable container, reset all cards opacity to 1
+        const cards = document.querySelectorAll('.mini-card, .result-card');
+        cards.forEach(card => {
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        });
         return;
     }
     
