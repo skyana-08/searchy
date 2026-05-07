@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxfyA4WfG6NIi_6ChDZHaXB3JqkOZdDmq3-RfalcDJw1zcWMCPpEwF6osSQ15NX-RLr/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxHnALmpsNqgCwU1p40CuH8oh8ECTM1dWTP6zTuo9OAcADRrN-l7G3N3A6kNlk47M5N/exec';
 
 let isSplitMode = false;
 let currentAccounts = [];
