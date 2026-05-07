@@ -198,18 +198,57 @@ body::before {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: visible;
     position: absolute;
     right: 0;
     top: 0;
-    scroll-behavior: smooth;
 }
 
-.split-right .results-area {
+/* Results container - centered in the right side */
+.split-right .results-container {
     width: 100%;
     max-width: 750px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fixed height container for 5+ results - IN THE MIDDLE OF RIGHT SIDE */
+.split-right .scrollable-container {
+    width: 100%;
+    max-height: 55vh;
+    overflow-y: auto;
     overflow-x: hidden;
+    scroll-behavior: smooth;
+    background: transparent;
+    margin: 0 auto;
+}
+
+/* Hide scrollbar for cleaner look */
+.split-right .scrollable-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.split-right .scrollable-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.split-right .scrollable-container::-webkit-scrollbar-thumb {
+    background: rgba(77, 132, 226, 0.3);
+    border-radius: 10px;
+}
+
+.split-right .scrollable-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(77, 132, 226, 0.5);
+}
+
+/* Normal container for 2-4 results - no fixed height */
+.split-right .mini-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
 }
 
 .split-left .hero {
@@ -231,7 +270,12 @@ body::before {
     width: 100%;
     margin-bottom: 16px;
     overflow-x: hidden;
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.split-right .result-card.fade-out {
+    opacity: 0.15;
+    transform: scale(0.98);
 }
 
 /* Custom scrollbar for right side - VERTICAL ONLY */
@@ -294,7 +338,7 @@ body::before {
     box-shadow: var(--shadow-md); 
     margin-bottom: 16px;
     overflow-x: hidden;
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 .result-card { border: 1px solid var(--border-card); }
 .card-header { padding: 24px 28px; display: flex; align-items: center; gap: 16px; background: var(--card-header-bg); border-bottom: 1px solid var(--card-header-border); flex-wrap: wrap; }
@@ -366,6 +410,7 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    width: 100%;
 }
 
 .mini-card {
@@ -609,8 +654,12 @@ html {
         padding: 20px;
     }
     
-    .split-right .results-area {
+    .split-right .results-container {
         max-width: 100%;
+    }
+    
+    .split-right .scrollable-container {
+        max-height: 50vh;
     }
     
     .mini-card {
