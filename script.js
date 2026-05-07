@@ -122,17 +122,25 @@ function renderMiniCards(accounts) {
     
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
     const totalResults = accounts.length;
+    // ONLY add scrollable container when 5 or MORE results
     const needsScrollableContainer = totalResults >= 5;
     
-    let resultsHTML = `
-        <div class="results-container">
-    `;
+    let resultsHTML = '';
     
     if (needsScrollableContainer) {
-        resultsHTML += `<div class="scrollable-container" id="resultsScrollContainer">`;
+        // WITH scrollable container - limits height
+        resultsHTML = `
+            <div class="results-container">
+                <div class="scrollable-container" id="resultsScrollContainer">
+                    <div class="mini-cards-container">
+        `;
+    } else {
+        // WITHOUT scrollable container - normal flow
+        resultsHTML = `
+            <div class="results-container">
+                <div class="mini-cards-container">
+        `;
     }
-    
-    resultsHTML += `<div class="mini-cards-container">`;
     
     accounts.forEach((account, index) => {
         const shortName = account.name.length > 35 ? account.name.substring(0, 32) + '...' : account.name;
@@ -151,15 +159,20 @@ function renderMiniCards(accounts) {
         `;
     });
     
-    resultsHTML += `</div>`;
-    
     if (needsScrollableContainer) {
-        resultsHTML += `</div>`;
-    }
-    
-    resultsHTML += `</div>
+        resultsHTML += `
+                    </div>
+                </div>
+            </div>
             <div id="full-detail-container" style="display: none;"></div>
-    `;
+        `;
+    } else {
+        resultsHTML += `
+                </div>
+            </div>
+            <div id="full-detail-container" style="display: none;"></div>
+        `;
+    }
     
     const heroHTML = document.querySelector('.hero')?.outerHTML || '';
     const searchPanelHTML = document.querySelector('.search-panel')?.outerHTML || '';
@@ -186,12 +199,21 @@ function renderMiniCards(accounts) {
 }
 
 function setupScrollFadeEffect() {
+    // Only get the scrollable container if it exists (5+ results)
     let container = document.querySelector('.split-right .scrollable-container');
     if (!container) {
+        // If no scrollable container, use split-right but don't apply fade
         container = document.querySelector('.split-right');
+        if (container) {
+            // Reset all cards opacity to 1 if no scrollable container
+            const cards = container.querySelectorAll('.mini-card, .result-card');
+            cards.forEach(card => {
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            });
+        }
+        return;
     }
-    
-    if (!container) return;
     
     scrollContainer = container;
     
