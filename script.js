@@ -2,7 +2,6 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxYul0ZWBeYcMpI2vo3A4EP
 
 let isSplitMode = false;
 let currentAccounts = [];
-let scrollTimeout = null;
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -10,15 +9,6 @@ function toggleTheme() {
     const next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
     localStorage.setItem('checkmych-theme', next);
-}
-
-function logout() {
-    localStorage.removeItem('checkmych-session');
-    localStorage.removeItem('checkmych-email');
-    localStorage.removeItem('checkmych-fullname');
-    localStorage.removeItem('checkmych-userid');
-    localStorage.removeItem('checkmych-role');
-    window.location.href = 'login.html';
 }
 
 (function initTheme() {
@@ -137,9 +127,7 @@ function renderMiniCards(accounts) {
     
     accounts.forEach((account, index) => {
         const shortName = account.name.length > 35 ? account.name.substring(0, 32) + '...' : account.name;
-        const status = account.status ? account.status.toLowerCase() : 'active';
-        const statusClass = status === 'pullout' ? 'status-pullout' : 'status-active';
-        const statusText = status === 'pullout' ? '✗ PULLOUT' : '✓ GO';
+        const placement = account.placement || 'N/A';
         
         resultsHTML += `
             <div class="mini-card" data-index="${index}" onclick="showAccountDetails(${index})">
@@ -147,7 +135,7 @@ function renderMiniCards(accounts) {
                 <div class="mini-card-info">
                     <div class="mini-card-name">${escapeHtml(shortName)}</div>
                     <div class="mini-card-code">${escapeHtml(account.code)}</div>
-                    <div class="mini-card-status ${statusClass}">${statusText}</div>
+                    <div class="mini-card-placement">${escapeHtml(placement)}</div>
                 </div>
                 <div class="mini-card-arrow">→</div>
             </div>
@@ -191,7 +179,6 @@ function setupScrollFadeEffect() {
     const allCards = scrollContainer.querySelectorAll('.result-card, .mini-card');
     allCards.forEach(card => {
         card.style.opacity = '1';
-        card.classList.remove('fading', 'faded-out');
     });
     
     const updateFadeEffect = () => {
@@ -267,22 +254,17 @@ window.backToResults = function() {
 };
 
 function generateFullDetailCard(data) {
-    const status = data.status ? data.status.toLowerCase() : 'active';
-    const isPullout = status === 'pullout';
-    const badgeText = isPullout ? '✗ PULLOUT' : '✓ GO';
-    const badgeClass = isPullout ? 'card-badge-pullout' : 'card-badge';
-    const headerClass = isPullout ? 'card-header-pullout' : 'card-header';
-    const resultCardClass = isPullout ? 'result-card pullout' : 'result-card success';
+    const placement = data.placement || 'N/A';
     
     return `
-        <div class="${resultCardClass}">
-            <div class="${headerClass}">
-                <div class="card-header-icon">${isPullout ? '✗' : '✓'}</div>
+        <div class="result-card">
+            <div class="card-header">
+                <div class="card-header-icon">✓</div>
                 <div class="card-header-info">
-                    <div class="card-header-title">Account ${isPullout ? 'Not Eligible' : 'Verified'}</div>
-                    <div class="card-header-sub">${isPullout ? 'PULLOUT - NOT ELIGIBLE FOR FIELD VISIT' : 'CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT'}</div>
+                    <div class="card-header-title">Account Verified</div>
+                    <div class="card-header-sub">CONFIRMED IN DATABASE · ELIGIBLE FOR FIELD VISIT</div>
                 </div>
-                <span class="${badgeClass}">${badgeText}</span>
+                <span class="card-badge-placement">${escapeHtml(placement)}</span>
             </div>
             <div class="card-details">
                 <div class="detail-item">
@@ -321,10 +303,10 @@ function generateFullDetailCard(data) {
                     </div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-item-icon">📌</div>
+                    <div class="detail-item-icon">📍</div>
                     <div class="detail-item-content">
-                        <div class="detail-item-label">Status</div>
-                        <div class="detail-item-value status-val ${isPullout ? 'status-pullout' : 'status-active'}">${escapeHtml(data.status || 'Active')}</div>
+                        <div class="detail-item-label">Placement</div>
+                        <div class="detail-item-value placement-val">${escapeHtml(placement)}</div>
                     </div>
                 </div>
             </div>
@@ -431,14 +413,13 @@ function showMessage(type, title, message, icon) {
     const resultDiv = document.getElementById('result');
     if (!resultDiv) return;
     
-    const isError = type === 'error';
     resultDiv.innerHTML = `
-        <div class="result-card ${isError ? 'error' : 'success'}">
+        <div class="result-card">
             <div class="card-header">
                 <div class="card-header-icon">${icon}</div>
                 <div class="card-header-info">
                     <div class="card-header-title">${escapeHtml(title)}</div>
-                    <div class="card-header-sub">${isError ? 'SEARCH COMPLETED — NO MATCH' : 'OPERATION SUCCESSFUL'}</div>
+                    <div class="card-header-sub">${type === 'error' ? 'SEARCH COMPLETED — NO MATCH' : 'OPERATION SUCCESSFUL'}</div>
                 </div>
             </div>
             <div class="card-message">
