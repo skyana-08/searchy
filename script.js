@@ -2,6 +2,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwCUIWiSxQ7XRcgXcZ2gMh5
 
 let isSplitMode = false;
 let currentAccounts = [];
+let scrollContainer = null;
+let fadeTimeout = null;
 
 function toggleTheme() {
     const html = document.documentElement;
@@ -119,11 +121,18 @@ function renderMiniCards(accounts) {
     const appRoot = document.getElementById('appRoot');
     
     const currentSearchValue = document.getElementById('searchInput')?.value || '';
+    const totalResults = accounts.length;
+    const needsScrollableContainer = totalResults >= 5;
     
     let resultsHTML = `
-        <div class="results-area">
-            <div class="mini-cards-container">
+        <div class="results-container">
     `;
+    
+    if (needsScrollableContainer) {
+        resultsHTML += `<div class="scrollable-container" id="resultsScrollContainer">`;
+    }
+    
+    resultsHTML += `<div class="mini-cards-container">`;
     
     accounts.forEach((account, index) => {
         const shortName = account.name.length > 35 ? account.name.substring(0, 32) + '...' : account.name;
@@ -142,10 +151,14 @@ function renderMiniCards(accounts) {
         `;
     });
     
-    resultsHTML += `
-            </div>
+    resultsHTML += `</div>`;
+    
+    if (needsScrollableContainer) {
+        resultsHTML += `</div>`;
+    }
+    
+    resultsHTML += `</div>
             <div id="full-detail-container" style="display: none;"></div>
-        </div>
     `;
     
     const heroHTML = document.querySelector('.hero')?.outerHTML || '';
@@ -173,42 +186,60 @@ function renderMiniCards(accounts) {
 }
 
 function setupScrollFadeEffect() {
-    const scrollContainer = document.querySelector('.split-right');
-    if (!scrollContainer) return;
+    let container = document.querySelector('.split-right .scrollable-container');
+    if (!container) {
+        container = document.querySelector('.split-right');
+    }
     
-    const allCards = scrollContainer.querySelectorAll('.result-card, .mini-card');
-    allCards.forEach(card => {
-        card.style.opacity = '1';
-    });
+    if (!container) return;
+    
+    scrollContainer = container;
     
     const updateFadeEffect = () => {
-        const scrollTop = scrollContainer.scrollTop;
-        const containerHeight = scrollContainer.clientHeight;
+        if (!scrollContainer) return;
         
-        const cards = scrollContainer.querySelectorAll('.result-card, .mini-card');
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const containerTop = containerRect.top;
+        const containerBottom = containerRect.bottom;
+        
+        const cards = scrollContainer.querySelectorAll('.mini-card, .result-card');
         
         cards.forEach(card => {
-            const cardTop = card.offsetTop;
-            const cardHeight = card.offsetHeight;
-            const cardCenter = cardTop + cardHeight / 2;
-            const scrollCenter = scrollTop + containerHeight / 2;
+            const cardRect = card.getBoundingClientRect();
+            const cardTop = cardRect.top;
+            const cardBottom = cardRect.bottom;
             
-            const distanceFromCenter = Math.abs(cardCenter - scrollCenter);
-            const maxDistance = containerHeight / 2;
+            const visibleTop = Math.max(containerTop, cardTop);
+            const visibleBottom = Math.min(containerBottom, cardBottom);
+            const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+            const totalCardHeight = cardRect.height;
             
-            if (distanceFromCenter > maxDistance) {
-                let opacity = 1 - (distanceFromCenter - maxDistance) / maxDistance;
-                opacity = Math.max(0.15, Math.min(1, opacity));
+            let visibilityRatio = visibleHeight / totalCardHeight;
+            
+            if (visibilityRatio >= 0.8) {
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+                card.classList.remove('fade-out');
+            } else if (visibilityRatio >= 0.3) {
+                const opacity = 0.5 + (visibilityRatio - 0.3) / 0.5 * 0.5;
                 card.style.opacity = opacity;
+                card.style.transform = 'scale(0.99)';
             } else {
-                card.style.opacity = 1;
+                const opacity = Math.max(0.15, visibilityRatio / 0.3 * 0.35);
+                card.style.opacity = opacity;
+                card.style.transform = 'scale(0.97)';
+                card.classList.add('fade-out');
             }
         });
     };
     
-    scrollContainer.addEventListener('scroll', () => {
-        requestAnimationFrame(updateFadeEffect);
-    });
+    const debouncedUpdate = () => {
+        if (fadeTimeout) cancelAnimationFrame(fadeTimeout);
+        fadeTimeout = requestAnimationFrame(updateFadeEffect);
+    };
+    
+    scrollContainer.addEventListener('scroll', debouncedUpdate);
+    window.addEventListener('resize', debouncedUpdate);
     
     updateFadeEffect();
 }
@@ -218,7 +249,12 @@ window.showAccountDetails = function(index) {
     if (!account) return;
     
     const fullDetailContainer = document.getElementById('full-detail-container');
-    const miniCardsContainer = document.querySelector('.mini-cards-container');
+    let miniCardsContainer = document.querySelector('.mini-cards-container');
+    let scrollableContainer = document.querySelector('.split-right .scrollable-container');
+    
+    if (!miniCardsContainer && scrollableContainer) {
+        miniCardsContainer = scrollableContainer.querySelector('.mini-cards-container');
+    }
     
     if (fullDetailContainer && miniCardsContainer) {
         miniCardsContainer.style.display = 'none';
@@ -233,8 +269,7 @@ window.showAccountDetails = function(index) {
             </div>
         `;
         
-        const splitRight = document.querySelector('.split-right');
-        if (splitRight) splitRight.scrollTop = 0;
+        if (scrollContainer) scrollContainer.scrollTop = 0;
         
         setTimeout(() => setupScrollFadeEffect(), 0);
     }
@@ -242,7 +277,12 @@ window.showAccountDetails = function(index) {
 
 window.backToResults = function() {
     const fullDetailContainer = document.getElementById('full-detail-container');
-    const miniCardsContainer = document.querySelector('.mini-cards-container');
+    let miniCardsContainer = document.querySelector('.mini-cards-container');
+    let scrollableContainer = document.querySelector('.split-right .scrollable-container');
+    
+    if (!miniCardsContainer && scrollableContainer) {
+        miniCardsContainer = scrollableContainer.querySelector('.mini-cards-container');
+    }
     
     if (fullDetailContainer && miniCardsContainer) {
         fullDetailContainer.style.display = 'none';
@@ -361,6 +401,7 @@ function exitSplitMode() {
     mainElement.classList.remove('split-mode');
     isSplitMode = false;
     currentAccounts = [];
+    scrollContainer = null;
     
     setTimeout(() => {
         attachEventListeners(currentSearchValue);
