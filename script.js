@@ -271,7 +271,7 @@ function renderBulkResults(results) {
                     </div>
                     <span class="bulk-result-toggle">▶</span>
                 </div>
-                <div class="bulk-result-details">
+                <div class="bulk-result-details" style="display: none;">
         `;
         
         if (isFound && result.account) {
@@ -418,11 +418,9 @@ function renderBulkResults(results) {
         bulkModeBtn.classList.add('active');
     }
     
-    // Re-attach event listeners for the new bulk button and textarea
     setTimeout(() => {
         const newBulkBtn = document.getElementById('bulkSearchBtn');
         if (newBulkBtn) {
-            // Remove any existing listeners by cloning and replacing
             const clonedBtn = newBulkBtn.cloneNode(true);
             newBulkBtn.parentNode.replaceChild(clonedBtn, newBulkBtn);
             clonedBtn.addEventListener('click', function(e) {
@@ -453,31 +451,35 @@ function setupBulkScrollFadeEffect() {
         const containerTop = containerRect.top;
         const containerBottom = containerRect.bottom;
         
-        const items = scrollContainer.querySelectorAll('.bulk-result-item');
+        // Only target the header elements, not the expanded content
+        const headers = scrollContainer.querySelectorAll('.bulk-result-header');
         
-        items.forEach(item => {
-            const itemRect = item.getBoundingClientRect();
-            const itemTop = itemRect.top;
-            const itemBottom = itemRect.bottom;
+        headers.forEach(header => {
+            const headerRect = header.getBoundingClientRect();
+            const headerTop = headerRect.top;
+            const headerBottom = headerRect.bottom;
             
-            const visibleTop = Math.max(containerTop, itemTop);
-            const visibleBottom = Math.min(containerBottom, itemBottom);
-            const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-            const totalItemHeight = itemRect.height;
+            // Check if the header is visible in the container
+            const isFullyVisible = headerTop >= containerTop && headerBottom <= containerBottom;
+            const isPartiallyVisible = (headerBottom > containerTop && headerTop < containerBottom);
             
-            let visibilityRatio = visibleHeight / totalItemHeight;
-            
-            if (visibilityRatio >= 0.8) {
-                item.style.opacity = '1';
-                item.style.transform = 'scale(1)';
-            } else if (visibilityRatio >= 0.3) {
-                const opacity = 0.5 + (visibilityRatio - 0.3) / 0.5 * 0.5;
-                item.style.opacity = opacity;
-                item.style.transform = 'scale(0.99)';
+            if (isFullyVisible) {
+                header.style.opacity = '1';
+                header.style.transform = 'scale(1)';
+            } else if (isPartiallyVisible) {
+                // Calculate how much is visible
+                const visibleTop = Math.max(containerTop, headerTop);
+                const visibleBottom = Math.min(containerBottom, headerBottom);
+                const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+                const totalHeight = headerRect.height;
+                const visibilityRatio = visibleHeight / totalHeight;
+                
+                const opacity = Math.max(0.3, visibilityRatio);
+                header.style.opacity = opacity;
+                header.style.transform = 'scale(0.99)';
             } else {
-                const opacity = Math.max(0.15, visibilityRatio / 0.3 * 0.35);
-                item.style.opacity = opacity;
-                item.style.transform = 'scale(0.97)';
+                header.style.opacity = '0.15';
+                header.style.transform = 'scale(0.97)';
             }
         });
     };
@@ -496,7 +498,16 @@ function setupBulkScrollFadeEffect() {
 window.toggleBulkResult = function(index) {
     const item = document.querySelector(`.bulk-result-item[data-index="${index}"]`);
     if (item) {
-        item.classList.toggle('expanded');
+        const details = item.querySelector('.bulk-result-details');
+        if (details) {
+            if (details.style.display === 'none' || details.style.display === '') {
+                details.style.display = 'block';
+                item.classList.add('expanded');
+            } else {
+                details.style.display = 'none';
+                item.classList.remove('expanded');
+            }
+        }
     }
 };
 
