@@ -38,13 +38,15 @@ function setSearchMode(mode) {
         bulkModeBtn.classList.remove('active');
         singlePanel.style.display = 'block';
         bulkPanel.style.display = 'none';
-        document.getElementById('searchInput').focus();
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.focus();
     } else {
         singleModeBtn.classList.remove('active');
         bulkModeBtn.classList.add('active');
         singlePanel.style.display = 'none';
         bulkPanel.style.display = 'block';
-        document.getElementById('bulkSearchInput').focus();
+        const bulkInput = document.getElementById('bulkSearchInput');
+        if (bulkInput) bulkInput.focus();
     }
     
     const resultDiv = document.getElementById('result');
@@ -375,7 +377,7 @@ function renderBulkResults(results) {
     `;
     
     const bulkPanelHTML = `
-        <div class="search-panel" id="bulkSearchPanel" style="display: none;">
+        <div class="search-panel" id="bulkSearchPanel" style="display: block;">
             <div class="bulk-search-field">
                 <textarea id="bulkSearchInput" rows="6" placeholder="Enter one search term per line&#10;Example:&#10;Willy Namoca&#10;02SBCCAC2604-2377&#10;Criselda Llamosa" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
                 <button id="bulkSearchBtn" onclick="performBulkSearch()">
@@ -416,8 +418,24 @@ function renderBulkResults(results) {
         bulkModeBtn.classList.add('active');
     }
     
+    // Re-attach event listeners for the new bulk button and textarea
     setTimeout(() => {
-        attachEventListeners('');
+        const newBulkBtn = document.getElementById('bulkSearchBtn');
+        if (newBulkBtn) {
+            // Remove any existing listeners by cloning and replacing
+            const clonedBtn = newBulkBtn.cloneNode(true);
+            newBulkBtn.parentNode.replaceChild(clonedBtn, newBulkBtn);
+            clonedBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                performBulkSearch();
+            });
+        }
+        
+        const newBulkInput = document.getElementById('bulkSearchInput');
+        if (newBulkInput && currentSearchMode === 'bulk') {
+            newBulkInput.focus();
+        }
+        
         setupBulkScrollFadeEffect();
     }, 0);
 }
