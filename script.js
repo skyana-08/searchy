@@ -2,7 +2,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwCUIWiSxQ7XRcgXcZ2gMh5
 
 let isSplitMode = false;
 let currentAccounts = [];
-let currentSearchMode = 'single'; // 'single' or 'bulk'
+let currentSearchMode = 'single';
 let scrollContainer = null;
 let fadeTimeout = null;
 
@@ -47,7 +47,6 @@ function setSearchMode(mode) {
         document.getElementById('bulkSearchInput').focus();
     }
     
-    // Clear results when switching modes
     const resultDiv = document.getElementById('result');
     if (resultDiv) resultDiv.innerHTML = '';
     exitSplitMode();
@@ -157,7 +156,6 @@ async function performBulkSearch() {
         return;
     }
     
-    // Split by new line and filter out empty lines
     const searchTerms = bulkText.split(/\r?\n/).filter(term => term.trim().length > 0);
     
     if (searchTerms.length === 0) {
@@ -195,28 +193,35 @@ async function performBulkSearch() {
     if (bulkBtn) bulkBtn.disabled = true;
     
     try {
-        const results = [];
+        const searchPromises = searchTerms.map(async (term) => {
+            try {
+                const response = await fetch(`${API_URL}?q=${encodeURIComponent(term.trim())}`);
+                const data = await response.json();
+                return {
+                    searchTerm: term.trim(),
+                    found: data.found || false,
+                    data: data.data || null,
+                    account: data.data ? {
+                        name: data.data.name,
+                        code: data.data.code,
+                        ob: data.data.ob,
+                        pd: data.data.pd,
+                        mad: data.data.mad,
+                        placement: data.data.placement || 'N/A'
+                    } : null
+                };
+            } catch (err) {
+                return {
+                    searchTerm: term.trim(),
+                    found: false,
+                    data: null,
+                    account: null,
+                    error: true
+                };
+            }
+        });
         
-        // Search each term one by one
-        for (let i = 0; i < searchTerms.length; i++) {
-            const term = searchTerms[i].trim();
-            const response = await fetch(`${API_URL}?q=${encodeURIComponent(term)}`);
-            const data = await response.json();
-            
-            results.push({
-                searchTerm: term,
-                found: data.found || false,
-                data: data.data || null,
-                account: data.data ? {
-                    name: data.data.name,
-                    code: data.data.code,
-                    ob: data.data.ob,
-                    pd: data.data.pd,
-                    mad: data.data.mad,
-                    placement: data.data.placement || 'N/A'
-                } : null
-            });
-        }
+        const results = await Promise.all(searchPromises);
         
         if (loadingDiv) {
             loadingDiv.style.display = 'none';
@@ -241,27 +246,13 @@ function renderBulkResults(results) {
     const mainElement = document.getElementById('mainContainer');
     const appRoot = document.getElementById('appRoot');
     
-    const searchPanelHTML = document.querySelector('.search-panel')?.outerHTML || '';
-    const searchModeToggleHTML = document.querySelector('.search-mode-toggle')?.outerHTML || '';
     const heroHTML = document.querySelector('.hero')?.outerHTML || '';
-    const singlePanelHTML = document.getElementById('singleSearchPanel')?.outerHTML || '';
-    const bulkPanelHTML = document.getElementById('bulkSearchPanel')?.outerHTML || '';
+    const searchModeToggleHTML = document.querySelector('.search-mode-toggle')?.outerHTML || '';
     
     let resultsHTML = `
         <div class="results-container">
             <div class="scrollable-container bulk-scroll" id="bulkResultsScrollContainer">
                 <div class="bulk-results-container">
-    `;
-    
-    let foundCount = results.filter(r => r.found).length;
-    let notFoundCount = results.filter(r => !r.found).length;
-    
-    resultsHTML += `
-        <div class="bulk-summary" style="padding: 12px 16px; background: var(--bg-detail-item); border-radius: 12px; margin-bottom: 16px; text-align: center;">
-            <span style="color: var(--sb-green-400);">✓ ${foundCount} Found</span>
-            <span style="color: #ef4444; margin-left: 16px;">✗ ${notFoundCount} Not Found</span>
-            <span style="color: var(--text-muted); margin-left: 16px;">📋 Total: ${results.length}</span>
-        </div>
     `;
     
     results.forEach((result, index) => {
@@ -362,6 +353,44 @@ function renderBulkResults(results) {
         </div>
     `;
     
+    const singlePanelHTML = `
+        <div class="search-panel" id="singleSearchPanel">
+            <div class="search-field">
+                <span class="search-field-icon">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </span>
+                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
+                <button id="searchBtn" onclick="performSearch()">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search</span>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    const bulkPanelHTML = `
+        <div class="search-panel" id="bulkSearchPanel" style="display: none;">
+            <div class="bulk-search-field">
+                <textarea id="bulkSearchInput" rows="6" placeholder="Enter one search term per line&#10;Example:&#10;Willy Namoca&#10;02SBCCAC2604-2377&#10;Criselda Llamosa" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+                <button id="bulkSearchBtn" onclick="performBulkSearch()">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search All</span>
+                </button>
+            </div>
+            <div class="bulk-info">Enter one search term per line. Supports Name or CH Code.</div>
+        </div>
+    `;
+    
     appRoot.innerHTML = `
         <div class="split-container">
             <div class="split-left">
@@ -380,7 +409,6 @@ function renderBulkResults(results) {
     isSplitMode = true;
     currentSearchMode = 'bulk';
     
-    // Update mode buttons to reflect bulk mode
     const singleModeBtn = document.getElementById('singleModeBtn');
     const bulkModeBtn = document.getElementById('bulkModeBtn');
     if (singleModeBtn && bulkModeBtn) {
@@ -511,45 +539,50 @@ function renderMiniCards(accounts) {
     
     const heroHTML = document.querySelector('.hero')?.outerHTML || '';
     const searchModeToggleHTML = document.querySelector('.search-mode-toggle')?.outerHTML || '';
-    const searchPanelHTML = document.querySelector('.search-panel')?.outerHTML || '';
+    const singlePanelHTML = `
+        <div class="search-panel" id="singleSearchPanel">
+            <div class="search-field">
+                <span class="search-field-icon">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </span>
+                <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
+                <button id="searchBtn" onclick="performSearch()">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search</span>
+                </button>
+            </div>
+        </div>
+    `;
+    const bulkPanelHTML = `
+        <div class="search-panel" id="bulkSearchPanel" style="display: none;">
+            <div class="bulk-search-field">
+                <textarea id="bulkSearchInput" rows="6" placeholder="Enter one search term per line&#10;Example:&#10;Willy Namoca&#10;02SBCCAC2604-2377&#10;Criselda Llamosa" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+                <button id="bulkSearchBtn" onclick="performBulkSearch()">
+                    <span class="btn-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </span>
+                    <span>Search All</span>
+                </button>
+            </div>
+            <div class="bulk-info">Enter one search term per line. Supports Name or CH Code.</div>
+        </div>
+    `;
     
     appRoot.innerHTML = `
         <div class="split-container">
             <div class="split-left">
                 ${heroHTML}
                 ${searchModeToggleHTML}
-                <div class="search-panel">
-                    <div class="search-field">
-                        <span class="search-field-icon">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                            </svg>
-                        </span>
-                        <input type="text" id="searchInput" placeholder="Search by Name or CH code" autocomplete="off" autocorrect="off" spellcheck="false"/>
-                        <button id="searchBtn" onclick="performSearch()">
-                            <span class="btn-icon">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                                </svg>
-                            </span>
-                            <span>Search</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="search-panel" id="bulkSearchPanel" style="display: none;">
-                    <div class="bulk-search-field">
-                        <textarea id="bulkSearchInput" rows="6" placeholder="Enter one search term per line..."></textarea>
-                        <button id="bulkSearchBtn" onclick="performBulkSearch()">
-                            <span class="btn-icon">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                                </svg>
-                            </span>
-                            <span>Search All</span>
-                        </button>
-                    </div>
-                    <div class="bulk-info">Enter one search term per line. Supports Name or CH Code.</div>
-                </div>
+                ${singlePanelHTML}
+                ${bulkPanelHTML}
             </div>
             <div class="split-right">
                 ${resultsHTML}
