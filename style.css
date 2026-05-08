@@ -403,6 +403,218 @@ body::before {
 .footer-tip kbd { padding: 2px 6px; background: var(--kbd-bg); border-radius: 4px; }
 
 /* ============================================ */
+/* SEARCH MODE TOGGLE BUTTONS */
+/* ============================================ */
+
+.search-mode-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.mode-btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-tag);
+    background: var(--bg-tag);
+    color: var(--text-secondary);
+}
+
+.mode-btn.active {
+    background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
+    color: white;
+    border-color: transparent;
+}
+
+.mode-btn:hover:not(.active) {
+    background: var(--bg-tag-hover);
+    border-color: var(--border-tag-hover);
+    transform: translateY(-1px);
+}
+
+/* ============================================ */
+/* BULK SEARCH PANEL */
+/* ============================================ */
+
+.bulk-search-field {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: 14px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all var(--transition-normal);
+}
+
+.bulk-search-field:focus-within {
+    border-color: var(--border-input-focus);
+    box-shadow: var(--shadow-glow);
+}
+
+#bulkSearchInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 14px;
+    resize: vertical;
+    font-family: var(--font-mono);
+    line-height: 1.6;
+}
+
+#bulkSearchInput::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+#bulkSearchBtn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+#bulkSearchBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0, 71, 187, 0.4);
+}
+
+.bulk-info {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+}
+
+/* ============================================ */
+/* BULK RESULTS CONTAINER */
+/* ============================================ */
+
+.bulk-results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.bulk-result-item {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border-detail);
+    overflow: hidden;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.bulk-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--bg-detail-item);
+    border-bottom: 1px solid var(--border-detail);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bulk-result-header:hover {
+    background: var(--bg-detail-hover);
+}
+
+.bulk-result-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.bulk-search-term {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-heading);
+}
+
+.bulk-result-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.bulk-result-badge.found {
+    background: rgba(0, 166, 81, 0.15);
+    color: var(--sb-green-400);
+}
+
+.bulk-result-badge.not-found {
+    background: rgba(220, 38, 38, 0.15);
+    color: #ef4444;
+}
+
+.bulk-result-toggle {
+    font-size: 20px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+}
+
+.bulk-result-item.expanded .bulk-result-toggle {
+    transform: rotate(90deg);
+}
+
+.bulk-result-details {
+    display: none;
+    padding: 20px;
+}
+
+.bulk-result-item.expanded .bulk-result-details {
+    display: block;
+}
+
+.bulk-not-found-message {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-muted);
+}
+
+/* Scrollable container for bulk results */
+.split-right .scrollable-container.bulk-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.split-right .scrollable-container.bulk-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.split-right .scrollable-container.bulk-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.split-right .scrollable-container.bulk-scroll::-webkit-scrollbar-thumb {
+    background: rgba(77, 132, 226, 0.3);
+    border-radius: 10px;
+}
+
+/* ============================================ */
 /* MINI CARDS STYLES */
 /* ============================================ */
 
@@ -630,6 +842,24 @@ html {
     #searchBtn { justify-content: center; }
     .footer { flex-direction: column; text-align: center; gap: 8px; }
     
+    .mode-btn {
+        padding: 8px 18px;
+        font-size: 12px;
+    }
+    
+    .bulk-result-header {
+        padding: 12px 16px;
+    }
+    
+    .bulk-search-term {
+        font-size: 12px;
+    }
+    
+    .bulk-result-badge {
+        font-size: 10px;
+        padding: 3px 10px;
+    }
+    
     .split-mode {
         height: auto;
         position: relative;
@@ -718,231 +948,6 @@ html {
     
     .detail-item-value {
         font-size: 13px;
-    }
-}
-
-/* Add these styles to your existing CSS */
-
-/* Search Mode Toggle Buttons */
-.search-mode-toggle {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.mode-btn {
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid var(--border-tag);
-    background: var(--bg-tag);
-    color: var(--text-secondary);
-}
-
-.mode-btn.active {
-    background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
-    color: white;
-    border-color: transparent;
-}
-
-.mode-btn:hover:not(.active) {
-    background: var(--bg-tag-hover);
-    border-color: var(--border-tag-hover);
-    transform: translateY(-1px);
-}
-
-/* Bulk Search Panel */
-.bulk-search-field {
-    width: 100%;
-    background: var(--bg-input);
-    border: 1px solid var(--border-input);
-    border-radius: 14px;
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: all var(--transition-normal);
-}
-
-.bulk-search-field:focus-within {
-    border-color: var(--border-input-focus);
-    box-shadow: var(--shadow-glow);
-}
-
-#bulkSearchInput {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 14px;
-    color: var(--text-primary);
-    padding: 14px;
-    resize: vertical;
-    font-family: var(--font-mono);
-    line-height: 1.6;
-}
-
-#bulkSearchInput::placeholder {
-    color: var(--text-muted);
-    opacity: 0.7;
-}
-
-#bulkSearchBtn {
-    padding: 12px 28px;
-    background: linear-gradient(135deg, var(--sb-blue-600), var(--sb-blue-800));
-    border-radius: 10px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-#bulkSearchBtn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(0, 71, 187, 0.4);
-}
-
-.bulk-info {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    margin-top: 8px;
-    font-family: var(--font-mono);
-}
-
-/* Bulk Results Container */
-.bulk-results-container {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    width: 100%;
-}
-
-.bulk-result-item {
-    background: var(--bg-card);
-    border-radius: 16px;
-    border: 1px solid var(--border-detail);
-    overflow: hidden;
-    animation: fadeInUp 0.3s ease-out;
-}
-
-.bulk-result-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    background: var(--bg-detail-item);
-    border-bottom: 1px solid var(--border-detail);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.bulk-result-header:hover {
-    background: var(--bg-detail-hover);
-}
-
-.bulk-result-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-}
-
-.bulk-search-term {
-    font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-heading);
-}
-
-.bulk-result-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.bulk-result-badge.found {
-    background: rgba(0, 166, 81, 0.15);
-    color: var(--sb-green-400);
-}
-
-.bulk-result-badge.not-found {
-    background: rgba(220, 38, 38, 0.15);
-    color: #ef4444;
-}
-
-.bulk-result-toggle {
-    font-size: 20px;
-    color: var(--text-muted);
-    transition: transform 0.2s ease;
-}
-
-.bulk-result-item.expanded .bulk-result-toggle {
-    transform: rotate(90deg);
-}
-
-.bulk-result-details {
-    display: none;
-    padding: 20px;
-}
-
-.bulk-result-item.expanded .bulk-result-details {
-    display: block;
-}
-
-.bulk-not-found-message {
-    text-align: center;
-    padding: 32px;
-    color: var(--text-muted);
-}
-
-/* Scrollable container for bulk results */
-.split-right .scrollable-container.bulk-scroll {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-.split-right .scrollable-container.bulk-scroll::-webkit-scrollbar {
-    width: 6px;
-}
-
-.split-right .scrollable-container.bulk-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.split-right .scrollable-container.bulk-scroll::-webkit-scrollbar-thumb {
-    background: rgba(77, 132, 226, 0.3);
-    border-radius: 10px;
-}
-
-@media (max-width: 860px) {
-    .mode-btn {
-        padding: 8px 18px;
-        font-size: 12px;
-    }
-    
-    .bulk-result-header {
-        padding: 12px 16px;
-    }
-    
-    .bulk-search-term {
-        font-size: 12px;
-    }
-    
-    .bulk-result-badge {
-        font-size: 10px;
-        padding: 3px 10px;
     }
 }
 
