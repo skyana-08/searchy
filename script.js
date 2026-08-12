@@ -195,41 +195,51 @@ async function performBulkSearch() {
     if (bulkBtn) bulkBtn.disabled = true;
     
     try {
-        const searchPromises = searchTerms.map(async (term) => {
-            try {
-                const response = await fetch(`${API_URL}?q=${encodeURIComponent(term.trim())}`);
-                const data = await response.json();
-                return {
-                    searchTerm: term.trim(),
-                    found: data.found || false,
-                    data: data.data || null,
-                    account: data.data ? {
-                        name: data.data.name,
-                        code: data.data.code,
-                        ob: data.data.ob,
-                        pd: data.data.pd,
-                        mad: data.data.mad,
-                        placement: data.data.placement || 'N/A'
-                    } : null
-                };
-            } catch (err) {
-                return {
-                    searchTerm: term.trim(),
-                    found: false,
-                    data: null,
-                    account: null,
-                    error: true
-                };
-            }
-        });
-        
-        const results = await Promise.all(searchPromises);
-        
+        // Single request for ALL terms — the backend builds/reuses one index
+        // and resolves every term against it in-memory. Much faster than
+        // firing one fetch per line, especially as the sheet grows.
+        const response = await fetch(`${API_URL}?terms=${encodeURIComponent(searchTerms.join('\n'))}`);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const payload = await response.json();
+
         if (loadingDiv) {
             loadingDiv.style.display = 'none';
             loadingDiv.classList.remove('active');
         }
         if (bulkBtn) bulkBtn.disabled = false;
+
+        // Map backend's { results: { term: {...} } } into the array shape
+        // renderBulkResults expects, preserving original input order.
+        const results = searchTerms.map(term => {
+            const trimmed = term.trim();
+            const entry = payload.results ? payload.results[trimmed] : null;
+
+            if (entry && entry.found && entry.data) {
+                return {
+                    searchTerm: trimmed,
+                    found: true,
+                    data: entry.data,
+                    account: {
+                        name: entry.data.name,
+                        code: entry.data.code,
+                        ob: entry.data.ob,
+                        pd: entry.data.pd,
+                        mad: entry.data.mad,
+                        placement: entry.data.placement || 'N/A'
+                    }
+                };
+            }
+            return {
+                searchTerm: trimmed,
+                found: false,
+                data: null,
+                account: null
+            };
+        });
         
         renderBulkResults(results);
         
